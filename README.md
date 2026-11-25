@@ -15,6 +15,12 @@ danach liegt es im Browser-Cache.
 
 ## Funktionen
 
+- **Umschalter 🐦 / 🦗** oben rechts: Vögel oder **Heuschrecken, Grillen und Zikaden** erkennen.
+  Im Insekten-Modus kennt die App 248 in Europa vorkommende Arten (z. B. Grünes Heupferd,
+  Feldgrille, Weinhähnchen, Nachtigall-Grashüpfer, Roesels Beißschrecke, Gemeine Singzikade,
+  Mannasingzikade) mit BirdNET+ V3.0. Das Insektenmodell (ca. 60 MB mit Rechen-Engine) wird erst
+  geladen, wenn man in den Insekten-Modus wechselt.
+
 - Aufnahme direkt im Browser mit buntem Live-Spektrum (bis 2 Minuten), danach automatische Analyse
 - **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
   und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist. Das Aufnahme-Vollbild
@@ -62,12 +68,14 @@ danach liegt es im Browser-Cache.
 | Datei/Ordner | Inhalt |
 |---|---|
 | `index.html`, `app.js`, `style.css` | Oberfläche (Aufnahme, Upload, Ergebnisse) |
-| `birdnet.js` | Erkennung: Audio einlesen, Spektrogramm, Modell, Bewertung |
+| `birdnet.js` | Vogelerkennung (BirdNET 2.4): Audio einlesen, Spektrogramm, Modell, Bewertung |
+| `insects.js` | Heuschrecken-/Insektenerkennung (BirdNET+ 3.0, ONNX Runtime Web) |
 | `mic.js` | Geräteerkennung, Mikrofon-Pfeil, Drehen des Aufnahme-Vollbilds (0°/180°) |
 | `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, CSV-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
-| `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge |
-| `vendor/` | TensorFlow.js 4.22 mit WebAssembly-Backend |
+| `model-insekten/` | BirdNET+ V3.0, Ausgabe auf Insekten gekürzt (`tools/build_insects.py`) |
+| `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge (Insekten: `data/insekten/`) |
+| `vendor/` | TensorFlow.js 4.22 mit WebAssembly-Backend, ONNX Runtime Web 1.31 (`vendor/ort`, MIT) |
 | `tools/` | Python-Skripte, mit denen `model/` und `data/` erzeugt wurden |
 
 Lokal testen: im Ordner `python3 -m http.server` starten und <http://localhost:8000> öffnen.
@@ -90,7 +98,12 @@ cd tools && python make_europe_list.py && python build_data.py
 Die Vogelfotos sind gemeinfrei (CC0) und stammen von [iNaturalist](https://www.inaturalist.org/).
 Die Quellen stehen in `img/voegel/quellen.txt`.
 
-## Erkennungsmodell und Lizenz
+## Erkennungsmodelle und Lizenzen
 
-Die BirdNET-Modelle stehen unter **CC BY-NC 4.0**. Private und nicht-kommerzielle Nutzung
-ist erlaubt, kommerzielle Nutzung nicht.
+- **Vögel:** BirdNET v2.4 (Cornell Lab of Ornithology & TU Chemnitz), **CC BY-NC 4.0** –
+  private und nicht-kommerzielle Nutzung erlaubt.
+  Quelle: <https://zenodo.org/records/15050749>
+- **Heuschrecken/Insekten:** BirdNET+ V3.0 und BirdNET+ Geomodel V3.0.5 (The BirdNET Team),
+  **Apache License 2.0**. Das Modell wurde auf Insekten und Störgeräusche gekürzt.
+  Quelle: <https://zenodo.org/records/24362980>
+- Europa-Liste der Insekten ergänzt um Fundmeldungen aus [GBIF](https://www.gbif.org/).

@@ -244,3 +244,15 @@ body.page-flipped .bird-row { display: none; }
   flex: none; width: 40px; height: 40px; border-radius: 50%; background: #fff3f1;
   color: var(--red); font-size: 1.05rem; display: grid; place-items: center;
 }
+
+/* ---------- Umschalter Vögel / Heuschrecken (klein, oben rechts) ---------- */
+.hero { position: relative; }
+.mode-switch {
+  position: absolute; top: 0; right: 0; z-index: 3; display: flex; gap: 2px; padding: 3px;
+  border-radius: 999px; background: rgba(255,255,255,.75); box-shadow: var(--shadow);
+}
+.mode-btn { width: 34px; height: 30px; border-radius: 999px; background: transparent; font-size: 1.05rem; line-height: 1; opacity: .45; }
+.mode-btn.active { background: var(--green); opacity: 1; }
+body:not(.mode-insekten) .only-insekten,
+body.mode-insekten .only-voegel { display: none !important; }
+@media (max-width: 999px) { .hero { padding-top: 40px; } }

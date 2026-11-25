@@ -1,7 +1,7 @@
 "use strict";
 /*
  * Mikrofon-Wegweiser: erkennt grob das Gerät und zeigt beim Aufnehmen mit einem Pfeil,
- * welche Seite zum Vogel zeigen soll. Dreht die Anzeige automatisch um 180°, wenn das
+ * welche Seite zum Tier zeigen soll. Dreht die Anzeige automatisch um 180°, wenn das
  * Handy "kopfüber" gehalten wird (Mikrofon nach vorne/oben), damit man sie lesen kann.
  *
  * Hinweis: Browser verraten die genaue Lage des Mikrofons nicht. Wir verwenden die
@@ -65,7 +65,7 @@ const MicGuide = (() => {
   const ready = detect().then((d) => {
     device = d;
     document.getElementById("deviceHint").innerHTML =
-      `${d.type === "desktop" ? "💻" : "📱"} <b></b>: Mikrofon ${d.where}. Beim Aufnehmen zeigt dir ein Pfeil, welche Seite zum Vogel zeigen soll.`;
+      `${d.type === "desktop" ? "💻" : "📱"} <b></b>: Mikrofon ${d.where}. Beim Aufnehmen zeigt dir ein Pfeil, welche Seite zum Tier zeigen soll.`;
     document.querySelector("#deviceHint b").textContent = d.name;
     return d;
   });
@@ -143,7 +143,7 @@ const MicGuide = (() => {
     const d = device || await ready;
     unflipPage();
     each(".ro-device", (el) => { el.textContent = `${d.type === "desktop" ? "💻" : "📱"} ${d.name}`; });
-    each(".ro-status", (el) => { el.textContent = "Der Pfeil zeigt zum Mikrofon – diese Seite zum Vogel halten."; });
+    each(".ro-status", (el) => { el.textContent = "Der Pfeil zeigt zum Mikrofon – diese Seite zum Tier halten."; });
     each(".ro-timer", (el) => { el.hidden = false; el.textContent = "0:00"; });
     each(".ro-result", (el) => { el.hidden = true; el.textContent = ""; });
     setButton("Aufnahme beenden", true, "stop");

@@ -6,8 +6,6 @@ Start:  python make_europe_list.py
 
 from pathlib import Path
 
-import birdnet
-
 OUT = Path(__file__).parent.parent / "data" / "europa_arten.txt"
 
 # grobe Umrisse Europas als (lat_min, lat_max, lon_min, lon_max)-Rechtecke
@@ -37,6 +35,8 @@ def grid():
 
 
 def build() -> set[str]:
+    import birdnet
+
     geo = birdnet.load("geo", "2.4", "tf", lang="de", library="litert")
     species: set[str] = set()
     points = sorted(set(grid()))

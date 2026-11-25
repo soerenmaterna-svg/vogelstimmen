@@ -147,19 +147,20 @@ async function analyze() {
     positionPromise = null;
     const lat = pos?.coords.latitude ?? null, lon = pos?.coords.longitude ?? null;
 
-    await ensureModel();
-    showStatus("Vogelstimme wird analysiert …");
-    const data = await BirdNET.analyze(currentBlob, {
+    const m = MODES[mode];
+    await ensureModel(mode);
+    showStatus("Aufnahme wird analysiert …");
+    const data = await m.engine().analyze(currentBlob, {
       lat: geoCheck.checked ? lat : null, lon: geoCheck.checked ? lon : null,
       exotics: exoticsCheck.checked,
-      onProgress: (p) => showStatus(`Vogelstimme wird analysiert … ${Math.round(p * 100)} %`),
+      onProgress: (p) => showStatus(`Aufnahme wird analysiert … ${Math.round(p * 100)} %`),
     });
 
     const entry = {
       created: currentTime, source: currentSource, audio: currentBlob, mime: currentBlob.type,
       duration: data.duration, lat, lon, accuracy: pos?.coords.accuracy ?? null, place: null,
       results: data.results.slice(0, 5).map(({ score, ...r }) => r), noises: data.noises,
-      filter: data.filter, species_count: data.species_count, confirmed: [], note: "",
+      filter: data.filter, species_count: data.species_count, confirmed: [], note: "", mode,
     };
     if (currentEntryId != null) {
       // erneute Bestimmung derselben Aufnahme: vorhandenen Fund aktualisieren
@@ -181,7 +182,7 @@ async function analyze() {
     renderResults(data, saved ? entry : null);
     if (MicGuide.isActive()) {
       const top = data.results[0];
-      const summary = top ? `🐦 ${top.name} · ${Math.round(top.confidence)} %` : "Kein Vogel sicher erkannt";
+      const summary = top ? `${m.icon} ${top.name} · ${Math.round(top.confidence)} %` : m.none;
       await closeOverlay(await MicGuide.finish("Fertig!", summary));
     }
   } catch (e) {
@@ -203,22 +204,63 @@ async function fillPlace(entry) {
   if (detailEntry?.id === entry.id) renderDetailHead(fresh);
 }
 
-// Modell beim Öffnen der Seite schon im Hintergrund laden (ca. 26 MB, danach im Browser-Cache)
-let modelReady = false, statusBusy = false;
-const modelPromise = BirdNET.load((p) => {
-  if (!modelReady && !statusEl.classList.contains("error") && statusBusy) {
-    showStatus(`Erkennungsmodell wird geladen … ${Math.round(p * 100)} %`);
-  }
-}).then(() => { modelReady = true; }, () => {});
+// ---------- Modus: Vögel oder Heuschrecken ----------
+const MODES = {
+  voegel: {
+    engine: () => BirdNET, icon: "🐦", size: "ca. 26 MB", title: "Vogelstimmen-Erkennung",
+    none: "Kein Vogel sicher erkannt", group: "europäischen Vogelarten",
+    escape: ["Gefangenschaftsflüchtling?", "Kommt in Europa nicht wild vor, wird aber oft in Volieren, Zoos oder Parks gehalten."],
+  },
+  insekten: {
+    engine: () => InsectNet, icon: "🦗", size: "ca. 60 MB", title: "Heuschrecken-Erkennung",
+    none: "Keine Heuschrecke sicher erkannt", group: "europäischen Heuschrecken, Grillen und Zikaden",
+    escape: ["Futterinsekt?", "Wird als Futterinsekt (Zoohandel, Terraristik) gehalten und kann entkommen sein."],
+  },
+};
+let mode = localStorage.getItem("modus") === "insekten" ? "insekten" : "voegel";
 
-async function ensureModel() {
-  if (modelReady) return;
+// Modelle laden (einmal je Modus, danach im Browser-Cache)
+const modelState = { voegel: { ready: false, promise: null }, insekten: { ready: false, promise: null } };
+let statusBusy = false;
+
+function preloadModel(m) {
+  const st = modelState[m];
+  if (!st.promise) {
+    st.promise = MODES[m].engine().load((p) => {
+      if (!st.ready && m === mode && statusBusy && !statusEl.classList.contains("error")) {
+        showStatus(`Erkennungsmodell wird geladen … ${Math.round(p * 100)} %`);
+      }
+    }).then(() => { st.ready = true; }, (e) => { st.promise = null; console.warn(e); });
+  }
+  return st.promise;
+}
+
+async function ensureModel(m) {
+  if (modelState[m].ready) return;
   statusBusy = true;
-  showStatus("Erkennungsmodell wird geladen … (nur beim ersten Mal, ca. 26 MB)");
-  await modelPromise;
-  if (!modelReady) await BirdNET.load(); // erneut versuchen, wirft ggf. den Fehler
+  showStatus(`Erkennungsmodell wird geladen … (nur beim ersten Mal, ${MODES[m].size})`);
+  await preloadModel(m);
+  if (!modelState[m].ready) await MODES[m].engine().load(); // erneut versuchen, wirft ggf. den Fehler
   statusBusy = false;
 }
+
+function applyMode(newMode, { userAction = false } = {}) {
+  mode = newMode;
+  localStorage.setItem("modus", mode);
+  document.body.classList.toggle("mode-insekten", mode === "insekten");
+  $("modeVoegel").classList.toggle("active", mode === "voegel");
+  $("modeInsekten").classList.toggle("active", mode === "insekten");
+  document.title = MODES[mode].title;
+  if (userAction) {
+    // Ergebnisse gehören zum anderen Modus -> ausblenden
+    hide(resultsEl); hide(statusEl);
+    currentEntryId = null;
+  }
+  preloadModel(mode);
+}
+$("modeVoegel").addEventListener("click", () => mode !== "voegel" && applyMode("voegel", { userAction: true }));
+$("modeInsekten").addEventListener("click", () => mode !== "insekten" && applyMode("insekten", { userAction: true }));
+applyMode(mode);
 
 function getPosition() {
   return new Promise((resolve) => {
@@ -233,7 +275,7 @@ function renderResults(data, entry) {
   hide(statusEl);
   $("filterInfo").textContent = data.filter === "regional"
     ? `Abgeglichen mit ${data.species_count} Arten, die an deinem Standort zu dieser Jahreszeit vorkommen.`
-    : `Abgeglichen mit ${data.species_count} europäischen Vogelarten.`;
+    : `Abgeglichen mit ${data.species_count} ${MODES[mode].group}.`;
   renderResultItems(resultList, data.results.slice(0, 5), entry);
   $("noiseInfo").textContent = noiseText(data.noises);
   $("savedInfo").hidden = !entry;
@@ -252,19 +294,25 @@ function noiseText(noises) {
 function renderResultItems(list, results, entry) {
   list.innerHTML = "";
   if (!results.length) {
-    list.innerHTML = `<li class="hint">Leider keinen Vogel sicher erkannt. Versuche es mit einer längeren
+    list.innerHTML = `<li class="hint">Leider nichts sicher erkannt. Versuche es mit einer längeren
       oder klareren Aufnahme (näher am Vogel, weniger Wind und Verkehr).</li>`;
   }
   results.forEach((r, i) => list.appendChild(resultItem(r, i === 0, entry)));
 }
 
-const BADGES = {
-  rare_here: ["Selten hier", "Europäische Art, die hier zu dieser Jahreszeit normalerweise nicht vorkommt."],
-  escape: ["Gefangenschaftsflüchtling?", "Kommt in Europa nicht wild vor, wird aber oft in Volieren, Zoos oder Parks gehalten."],
-  vagrant: ["Möglicher Irrgast", "Art von außerhalb Europas. Kann als verflogener Irrgast vorkommen, ist aber sehr selten – Verwechslung wahrscheinlicher."],
-};
+function badges(m) {
+  return {
+    rare_here: ["Selten hier", "Europäische Art, die hier zu dieser Jahreszeit normalerweise nicht vorkommt."],
+    escape: MODES[m].escape,
+    vagrant: m === "insekten"
+      ? ["Nicht heimisch", "Art von außerhalb Europas. Höchstens eingeschleppt – eine Verwechslung ist wahrscheinlicher."]
+      : ["Möglicher Irrgast", "Art von außerhalb Europas. Kann als verflogener Irrgast vorkommen, ist aber sehr selten – Verwechslung wahrscheinlicher."],
+  };
+}
 
 function resultItem(r, top, entry) {
+  const m = entry?.mode || mode;
+  const BADGES = badges(m);
   const li = document.createElement("li");
   li.className = "result" + (top ? " top" : "");
   const pct = Math.round(r.confidence);
@@ -276,7 +324,7 @@ function resultItem(r, top, entry) {
   const at = `${Math.floor(r.best_at / 60)}:${String(Math.floor(r.best_at % 60)).padStart(2, "0")}`;
   li.innerHTML = `
     <div class="result-main">
-      <div class="ph">🐦</div>
+      <div class="ph">${MODES[m].icon}</div>
       <div class="info">
         <div class="name"><a href="${wiki}" target="_blank" rel="noopener"></a></div>
         <div class="sci"></div>
@@ -384,7 +432,7 @@ async function renderHistory() {
     const top = e.results[0];
     const seen = e.results.filter((r) => e.confirmed.includes(r.scientific));
     li.innerHTML = `
-      <div class="ph">🐦</div>
+      <div class="ph">${MODES[e.mode || "voegel"].icon}</div>
       <div class="info">
         <div class="h-species"></div>
         <div class="h-meta"></div>
@@ -394,7 +442,7 @@ async function renderHistory() {
       <div class="h-arrow">›</div>`;
     const title = seen.length
       ? seen.map((r) => `✅ ${r.name}`).join(", ")
-      : top ? `${top.name} · ${Math.round(top.confidence)} %` : "Kein Vogel erkannt";
+      : top ? `${top.name} · ${Math.round(top.confidence)} %` : MODES[e.mode || "voegel"].none;
     li.querySelector(".h-species").textContent = title;
     li.querySelector(".h-meta").textContent = formatDate(e.created) + (e.results.length > 1 && !seen.length ? ` · +${e.results.length - 1} weitere` : "");
     li.querySelector(".h-place").textContent = "📍 " + placeText(e);

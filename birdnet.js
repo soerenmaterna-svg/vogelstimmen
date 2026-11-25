@@ -158,8 +158,8 @@ const BirdNET = (() => {
     return loading;
   }
 
-  /** Beliebige Audiodatei -> Float32Array, mono, 48 kHz */
-  async function decode(blob) {
+  /** Beliebige Audiodatei -> Float32Array, mono, in der gewünschten Abtastrate */
+  async function decode(blob, SAMPLE_RATE = 48000) {
     const buf = await blob.arrayBuffer();
     const Ctx = window.AudioContext || window.webkitAudioContext;
     // Kontext mit 48 kHz anlegen: dann liefert decodeAudioData die Daten direkt in der
@@ -285,5 +285,5 @@ const BirdNET = (() => {
     };
   }
 
-  return { load, analyze };
+  return { load, analyze, decode };
 })();

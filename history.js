@@ -68,13 +68,13 @@ const History = (() => {
 
   /** Alle Funde als CSV (eine Zeile pro erkannter Art), für Excel mit Semikolon */
   async function toCSV() {
-    const rows = [["Datum", "Uhrzeit", "Fundort", "Breite", "Länge", "Art", "Wissenschaftlicher Name",
+    const rows = [["Gruppe", "Datum", "Uhrzeit", "Fundort", "Breite", "Länge", "Art", "Wissenschaftlicher Name",
       "Sicherheit (%)", "Gesehen", "Notiz"]];
     for (const e of await all()) {
       const d = new Date(e.created);
-      const base = [d.toLocaleDateString("de-DE"), d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
+      const base = [e.mode === "insekten" ? "Heuschrecken/Insekten" : "Vögel", d.toLocaleDateString("de-DE"), d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
         e.place || "", e.lat?.toFixed(5) ?? "", e.lon?.toFixed(5) ?? ""];
-      const species = e.results.length ? e.results : [{ name: "(kein Vogel erkannt)", scientific: "", confidence: "" }];
+      const species = e.results.length ? e.results : [{ name: "(nichts erkannt)", scientific: "", confidence: "" }];
       for (const r of species) {
         rows.push([...base, r.name, r.scientific, String(r.confidence).replace(".", ","),
           e.confirmed.includes(r.scientific) ? "ja" : "", e.note || ""]);
