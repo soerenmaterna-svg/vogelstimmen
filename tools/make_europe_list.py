@@ -8,7 +8,7 @@ from pathlib import Path
 
 import birdnet
 
-OUT = Path(__file__).parent / "europa_arten.txt"
+OUT = Path(__file__).parent.parent / "data" / "europa_arten.txt"
 
 # grobe Umrisse Europas als (lat_min, lat_max, lon_min, lon_max)-Rechtecke
 BOXES = [

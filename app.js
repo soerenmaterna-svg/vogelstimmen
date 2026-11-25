@@ -85,7 +85,8 @@ function drawLevel() {
     ctx.fillStyle = "#2f5d3a";
     const bars = 100, bw = w / bars;
     for (let i = 0; i < bars; i++) {
-      const v = data[Math.floor((i / bars) * maxBin)] / 255;
+      // Frequenzen gleichmäßig über die Breite verteilen, leise Anteile etwas anheben
+      const v = Math.min(1, Math.pow(data[Math.floor((i / bars) * maxBin)] / 255, 0.7) * 1.2);
       ctx.fillRect(i * bw, h - v * h, bw - 1, v * h);
     }
     rafId = requestAnimationFrame(draw);
@@ -117,30 +118,44 @@ async function analyze() {
   if (!currentBlob) return;
   analyzeBtn.disabled = true;
   hide(resultsEl);
-  const form = new FormData();
-  form.append("audio", currentBlob, currentName);
-  form.append("exotics", exoticsCheck.checked ? "true" : "false");
-
-  if (geoCheck.checked) {
-    showStatus("Standort wird ermittelt …");
-    const pos = await getPosition();
-    if (pos) {
-      form.append("lat", pos.coords.latitude.toFixed(3));
-      form.append("lon", pos.coords.longitude.toFixed(3));
-    }
-  }
-
-  showStatus("Vogelstimme wird analysiert …");
   try {
-    const res = await fetch("/api/analyze", { method: "POST", body: form });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || `Serverfehler (${res.status})`);
+    let lat = null, lon = null;
+    if (geoCheck.checked) {
+      showStatus("Standort wird ermittelt …");
+      const pos = await getPosition();
+      if (pos) { lat = pos.coords.latitude; lon = pos.coords.longitude; }
+    }
+    await ensureModel();
+    showStatus("Vogelstimme wird analysiert …");
+    const data = await BirdNET.analyze(currentBlob, {
+      lat, lon, exotics: exoticsCheck.checked,
+      onProgress: (p) => showStatus(`Vogelstimme wird analysiert … ${Math.round(p * 100)} %`),
+    });
     renderResults(data);
   } catch (e) {
-    showError(e.message);
+    console.error(e);
+    showError(e.message || String(e));
   } finally {
     analyzeBtn.disabled = false;
   }
+}
+
+// Modell beim Öffnen der Seite schon im Hintergrund laden (ca. 26 MB, danach im Browser-Cache)
+let modelReady = false;
+const modelPromise = BirdNET.load((p) => {
+  if (!modelReady && !statusEl.classList.contains("error") && statusBusy) {
+    showStatus(`Erkennungsmodell wird geladen … ${Math.round(p * 100)} %`);
+  }
+}).then(() => { modelReady = true; }, () => {});
+let statusBusy = false;
+
+async function ensureModel() {
+  if (modelReady) return;
+  statusBusy = true;
+  showStatus("Erkennungsmodell wird geladen … (nur beim ersten Mal, ca. 26 MB)");
+  await modelPromise;
+  if (!modelReady) await BirdNET.load(); // erneut versuchen, wirft ggf. den Fehler
+  statusBusy = false;
 }
 
 function getPosition() {

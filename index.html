@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2f5d3a">
 <title>Vogelstimmen-Erkennung</title>
-<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
-<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-<link rel="manifest" href="/static/manifest.webmanifest">
-<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main>
   <header>
-    <h1><img src="/static/favicon.svg" alt="" class="logo"> Welcher Vogel singt da?</h1>
+    <h1><img src="favicon.svg" alt="" class="logo"> Welcher Vogel singt da?</h1>
     <p class="sub">Nimm eine Vogelstimme auf oder lade eine Aufnahme hoch.</p>
   </header>
 
@@ -60,10 +60,13 @@
 
   <footer>
     Erkennung mit <a href="https://birdnet.cornell.edu/" target="_blank" rel="noopener">BirdNET</a>
-    (Cornell Lab of Ornithology &amp; TU Chemnitz), Modell lizenziert unter CC BY-NC-SA 4.0.<br>
+    (Cornell Lab of Ornithology &amp; TU Chemnitz), Modell lizenziert unter CC BY-NC 4.0 (nur nicht-kommerzielle Nutzung). Die Analyse läuft komplett auf deinem Gerät, es werden keine Aufnahmen hochgeladen.<br>
     Tipp: 10–30 Sekunden aufnehmen, Handy in Richtung Vogel halten, möglichst wenig Nebengeräusche.
   </footer>
 </main>
-<script src="/static/app.js"></script>
+<script src="vendor/tf.min.js"></script>
+<script src="vendor/tf-backend-wasm.min.js"></script>
+<script src="birdnet.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
