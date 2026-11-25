@@ -209,8 +209,8 @@ footer a { color: var(--green); }
 .side-right .ro-arrow { right: max(6px, env(safe-area-inset-right)); top: 50%; translate: 0 -50%; flex-direction: column; }
 .side-right .arrow-svg { rotate: -90deg; }
 
-/* Querformat / wenig Höhe: kompakter */
-@media (max-height: 560px) {
+/* sehr kleine Bildschirme: kompakter */
+@media (max-height: 560px) and (max-width: 560px) {
   .ro-status, .ro-device { display: none; }
   .ro-timer { font-size: 1.8rem; }
   .ro-btn { padding: 10px; }

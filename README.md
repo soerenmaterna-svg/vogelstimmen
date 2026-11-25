@@ -18,7 +18,8 @@ danach liegt es im Browser-Cache.
 - Aufnahme direkt im Browser mit buntem Live-Spektrum (bis 2 Minuten), danach automatische Analyse
 - **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
   und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist. Dreht das Gerät die
-  Anzeige (Querformat, kopfüber), wandert der Pfeil mit. Timer und Knöpfe stehen im Vollbild
+  Anzeige ins Querformat oder auf den Kopf, dreht die App das Vollbild zurück: Es bleibt immer
+  am Gerät ausgerichtet (nur gerade oder 180°), der Pfeil zeigt zur Mikrofon-Kante. Timer und Knöpfe stehen im Vollbild
   zweimal da – einmal auf dem Kopf –, damit sie immer lesbar sind, egal wie man das Handy hält.
   Nach der Analyse tippt man in der lesbaren Hälfte auf „Ergebnis anzeigen“; die Ergebnisseite
   erscheint dann in genau dieser Richtung.

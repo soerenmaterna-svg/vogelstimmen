@@ -76,11 +76,23 @@ const MicGuide = (() => {
     return ((Math.round(a / 90) * 90) % 360 + 360) % 360;
   }
 
-  /** Pfeil an die Bildschirmseite setzen, an der das Mikrofon tatsächlich sitzt */
+  /**
+   * Das Vollbild bleibt immer am Gerät ausgerichtet (Hochformat): Dreht das Handy die
+   * Anzeige ins Querformat (90°/270°) oder auf den Kopf, drehen wir das Vollbild zurück.
+   * Lesbar ist es dann gerade oder um 180° gedreht – dafür gibt es die zwei Hälften.
+   * Der Pfeil zeigt damit immer auf die Mikrofon-Kante des Geräts.
+   */
   function placeArrow() {
     if (!device) return;
-    const side = SIDES[(SIDES.indexOf(device.edge) - screenAngle() / 90 + 8) % 4];
-    for (const s of SIDES) overlay.classList.toggle(`side-${s}`, s === side);
+    const a = screenAngle();
+    const w = window.innerWidth, h = window.innerHeight;
+    const quer = a === 90 || a === 270;
+    Object.assign(overlay.style, {
+      inset: "auto", top: "50%", left: "50%",
+      width: `${quer ? h : w}px`, height: `${quer ? w : h}px`,
+      transform: `translate(-50%, -50%) rotate(${-a}deg)`,
+    });
+    for (const s of SIDES) overlay.classList.toggle(`side-${s}`, s === device.edge);
   }
 
   function each(sel, fn) { halves.forEach((h) => fn(h.querySelector(sel), h)); }
