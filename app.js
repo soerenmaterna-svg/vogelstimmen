@@ -506,11 +506,9 @@ $("deleteAllBtn").addEventListener("click", async () => {
 });
 
 // ---------- Hilfsfunktionen ----------
-// Vollbild schließen und die Seite so anzeigen, wie das Handy gerade gehalten wird
-// (die Hälfte, in der getippt wurde, verrät die Richtung)
-async function closeOverlay(direction) {
-  MicGuide.hide();
-  if (direction === "upside") MicGuide.flipPage();
+// Vollbild schließen und die Ergebnisseite anzeigen
+async function closeOverlay() {
+  MicGuide.hide(); // war die Anzeige gedreht, bleibt die Ergebnisseite gedreht
   const target = resultsEl.hidden ? statusEl : resultsEl;
   target.scrollIntoView({ block: "start" });
 }

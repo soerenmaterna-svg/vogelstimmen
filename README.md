@@ -17,12 +17,12 @@ danach liegt es im Browser-Cache.
 
 - Aufnahme direkt im Browser mit buntem Live-Spektrum (bis 2 Minuten), danach automatische Analyse
 - **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
-  und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist. Dreht das Gerät die
-  Anzeige ins Querformat oder auf den Kopf, dreht die App das Vollbild zurück: Es bleibt immer
-  am Gerät ausgerichtet (nur gerade oder 180°), der Pfeil zeigt zur Mikrofon-Kante. Timer und Knöpfe stehen im Vollbild
-  zweimal da – einmal auf dem Kopf –, damit sie immer lesbar sind, egal wie man das Handy hält.
-  Nach der Analyse tippt man in der lesbaren Hälfte auf „Ergebnis anzeigen“; die Ergebnisseite
-  erscheint dann in genau dieser Richtung.
+  und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist. Das Aufnahme-Vollbild
+  bleibt immer im Hochformat am Gerät ausgerichtet (auch wenn das Handy ins Querformat schaltet)
+  und dreht sich nur um 180°, wenn das Handy auf dem Kopf gehalten wird (Lagesensor; liegt das
+  Handy flach, bleibt die Anzeige wie sie ist). Zusätzlich gibt es den Knopf „Drehen“. War die
+  Anzeige beim Beenden gedreht, erscheint auch das Ergebnis gedreht, bis man das Handy wieder
+  gerade hält (oder „Normal anzeigen“ tippt).
   Hinweis: Browser verraten die genaue Mikrofon-Lage nicht; die App nutzt die typische Lage
   (Handys unten an der Ladebuchse, Tablets und Laptops oben).
 - Hochladen von Aufnahmen (mp3, m4a, wav, ogg, flac, webm …)
@@ -63,7 +63,7 @@ danach liegt es im Browser-Cache.
 |---|---|
 | `index.html`, `app.js`, `style.css` | Oberfläche (Aufnahme, Upload, Ergebnisse) |
 | `birdnet.js` | Erkennung: Audio einlesen, Spektrogramm, Modell, Bewertung |
-| `mic.js` | Geräteerkennung, Mikrofon-Pfeil, Aufnahme-Vollbild in beide Richtungen |
+| `mic.js` | Geräteerkennung, Mikrofon-Pfeil, Drehen des Aufnahme-Vollbilds (0°/180°) |
 | `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, CSV-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
 | `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge |
