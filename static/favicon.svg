@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="body" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#a9c99a"/>
+      <stop offset="1" stop-color="#5f8f55"/>
+    </radialGradient>
+    <radialGradient id="belly" cx="45%" cy="40%" r="65%">
+      <stop offset="0" stop-color="#ffd9a8"/>
+      <stop offset="1" stop-color="#f29a4a"/>
+    </radialGradient>
+  </defs>
+  <!-- flauschiger Körper (gewellter Rand) -->
+  <path fill="url(#body)" d="M30 12 q4 -3 8 0 q5 -1 7 3 q5 1 6 6 q4 3 3 8 q3 4 0 8 q1 5 -3 7 q-1 5 -6 6 q-3 4 -8 3 q-4 3 -8 0 q-5 1 -7 -3 q-5 -1 -6 -6 q-4 -3 -3 -8 q-3 -4 0 -8 q-1 -5 3 -7 q1 -5 6 -6 q3 -4 8 -3 z"/>
+  <!-- Federbüschel -->
+  <path fill="#5f8f55" d="M30 13 q-3 -7 1 -9 q0 5 3 8 q0 -6 4 -7 q-2 5 0 9 z"/>
+  <!-- Bauch -->
+  <path fill="url(#belly)" d="M22 38 q2 -4 6 -3 q3 -3 7 -1 q4 -2 6 2 q4 1 3 5 q1 5 -4 7 q-3 4 -8 3 q-5 1 -7 -3 q-4 -2 -3 -6 z"/>
+  <!-- Flügel -->
+  <path fill="#4b7744" d="M16 36 q2 -8 10 -6 q-2 6 -6 10 q-3 1 -4 -4 z"/>
+  <!-- Auge -->
+  <circle cx="38" cy="25" r="4.2" fill="#fff"/>
+  <circle cx="39" cy="25.5" r="2.6" fill="#1f2a22"/>
+  <circle cx="40" cy="24.4" r="0.9" fill="#fff"/>
+  <!-- Wangen -->
+  <circle cx="44" cy="31" r="2.3" fill="#ff9aa2" opacity=".7"/>
+  <!-- offener Schnabel (zwitschert) -->
+  <path fill="#f6b72c" d="M47 25 l11 -3 l-9 5 z"/>
+  <path fill="#e39a12" d="M47 28 l10 3 l-10 -1 z"/>
+  <!-- Füßchen -->
+  <path stroke="#e39a12" stroke-width="2" stroke-linecap="round" fill="none" d="M27 53 v4 M35 53 v4"/>
+  <!-- Musiknoten -->
+  <g fill="#2f5d3a">
+    <ellipse cx="55.5" cy="13" rx="2.6" ry="2" transform="rotate(-20 55.5 13)"/>
+    <rect x="57.3" y="3" width="1.3" height="10"/>
+    <path d="M57.3 3 q4 1 5 5 q-2 -2 -5 -2 z"/>
+  </g>
+  <g fill="#2f5d3a" opacity=".75">
+    <ellipse cx="10" cy="12" rx="2" ry="1.6" transform="rotate(-20 10 12)"/>
+    <rect x="11.3" y="4" width="1.1" height="8"/>
+  </g>
+</svg>

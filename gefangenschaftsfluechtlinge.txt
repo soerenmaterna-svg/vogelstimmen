@@ -1,0 +1,83 @@
+# Arten (oder ganze Gattungen), die in Europa als Gefangenschaftsflüchtlinge aus
+# Volieren, Zoos, Parks oder Geflügelhaltung auftreten können.
+# Eine Zeile = wissenschaftlicher Name oder Gattung (Präfix). '#' = Kommentar.
+
+# Papageien & Sittiche
+Psittacula
+Myiopsitta monachus
+Melopsittacus undulatus
+Nymphicus hollandicus
+Agapornis
+Cacatua
+Ara
+Amazona
+Aratinga
+Psittacus erithacus
+Platycercus
+Neophema
+Barnardius
+Brotogeris
+Pyrrhura
+Nandayus nenday
+
+# Wasservögel aus Parkhaltung
+Aix
+Alopochen aegyptiaca
+Tadorna ferruginea
+Tadorna tadornoides
+Cygnus atratus
+Cygnus melancoryphus
+Anser cygnoides
+Anser indicus
+Branta canadensis
+Branta hutchinsii
+Oxyura jamaicensis
+Cairina moschata
+Dendrocygna
+Netta peposaca
+Anas bahamensis
+Callonetta leucophrys
+Chloephaga
+Phoenicopterus chilensis
+Phoenicopterus ruber
+
+# Hühnervögel & Fasane
+Pavo cristatus
+Chrysolophus
+Phasianus colchicus
+Syrmaticus reevesii
+Numida meleagris
+Gallus gallus
+Alectoris chukar
+Colinus virginianus
+Callipepla californica
+
+# Ziervögel (Finken, Prachtfinken, Webervögel)
+Serinus canaria
+Taeniopygia
+Estrilda
+Amandava
+Lonchura
+Euplectes
+Ploceus
+Vidua
+Padda oryzivora
+Uraeginthus
+Lagonosticta
+Crithagra mozambica
+Sicalis flaveola
+Paroaria
+
+# Weitere häufige Käfig- und Zoovögel
+Leiothrix lutea
+Garrulax
+Pycnonotus jocosus
+Acridotheres
+Gracula religiosa
+Corvus splendens
+Streptopelia roseogrisea
+Geopelia cuneata
+Lamprotornis
+Threskiornis
+Bubo bubo
+Tyto alba
