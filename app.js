@@ -27,6 +27,7 @@ $("backBtn").addEventListener("click", () => openHistory());
 recBtn.addEventListener("click", () => (recorder ? stopRecording() : startRecording()));
 
 async function startRecording() {
+  MicGuide.requestSensor(); // iOS: Lage-Sensor muss direkt beim Tippen erlaubt werden
   if (!navigator.mediaDevices?.getUserMedia) {
     return showError("Aufnehmen wird hier nicht unterstützt. Die Seite muss über HTTPS (oder localhost) geöffnet werden.");
   }
@@ -53,9 +54,7 @@ async function startRecording() {
   };
   recorder.start(1000);
   startedAt = Date.now();
-  recBtn.classList.add("recording");
-  recLabel.textContent = "Aufnahme beenden";
-  timerEl.hidden = levelCanvas.hidden = false;
+  MicGuide.show();
   timerId = setInterval(tick, 250);
   tick();
   drawLevel();
@@ -79,10 +78,10 @@ function cleanupRecording() {
   stream?.getTracks().forEach((t) => t.stop());
   audioCtx?.close();
   recorder = stream = audioCtx = null;
-  recBtn.classList.remove("recording");
   recLabel.textContent = "Neue Aufnahme starten";
-  timerEl.hidden = levelCanvas.hidden = true;
+  MicGuide.hide();
 }
+$("stopBtn").addEventListener("click", stopRecording);
 
 function drawLevel() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -97,12 +96,15 @@ function drawLevel() {
   const draw = () => {
     analyser.getByteFrequencyData(data);
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "#2f5d3a";
-    const bars = 100, bw = w / bars;
+    const bars = 64, bw = w / bars;
     for (let i = 0; i < bars; i++) {
       // Frequenzen gleichmäßig über die Breite verteilen, leise Anteile etwas anheben
-      const v = Math.min(1, Math.pow(data[Math.floor((i / bars) * maxBin)] / 255, 0.7) * 1.2);
-      ctx.fillRect(i * bw, h - v * h, bw - 1, v * h);
+      const v = Math.max(0.03, Math.min(1, Math.pow(data[Math.floor((i / bars) * maxBin)] / 255, 0.7) * 1.2));
+      ctx.fillStyle = `hsl(${110 + (i / bars) * 200}, 65%, 70%)`; // bunt: grün -> blau -> violett
+      const bh = v * h;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(i * bw + 1, h - bh, bw - 3, bh, 3) : ctx.rect(i * bw + 1, h - bh, bw - 3, bh);
+      ctx.fill();
     }
     rafId = requestAnimationFrame(draw);
   };

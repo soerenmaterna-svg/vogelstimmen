@@ -15,7 +15,13 @@ danach liegt es im Browser-Cache.
 
 ## Funktionen
 
-- Aufnahme direkt im Browser mit Live-Spektrum (bis 2 Minuten), danach automatische Analyse
+- Aufnahme direkt im Browser mit buntem Live-Spektrum (bis 2 Minuten), danach automatische Analyse
+- **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
+  und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist und welche Seite zum
+  Vogel zeigen soll. Hält man das Handy mit dem Mikrofon nach vorne/oben, dreht sich die Anzeige
+  automatisch um 180°, damit sie lesbar bleibt (oder per Knopf „Anzeige drehen“).
+  Hinweis: Browser verraten die genaue Mikrofon-Lage nicht; die App nutzt die typische Lage
+  (Handys unten an der Ladebuchse, Tablets und Laptops oben).
 - Hochladen von Aufnahmen (mp3, m4a, wav, ogg, flac, webm …)
 - Bis zu 5 Treffer mit Prozentwert, Wikipedia-Link und Vorschaubild
 - **Europäische Arten** (559 Arten, siehe `data/europa_arten.txt`) werden bevorzugt
@@ -52,6 +58,7 @@ danach liegt es im Browser-Cache.
 |---|---|
 | `index.html`, `app.js`, `style.css` | Oberfläche (Aufnahme, Upload, Ergebnisse) |
 | `birdnet.js` | Erkennung: Audio einlesen, Spektrogramm, Modell, Bewertung |
+| `mic.js` | Geräteerkennung, Mikrofon-Pfeil, automatisches Drehen der Anzeige |
 | `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, CSV-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
 | `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge |

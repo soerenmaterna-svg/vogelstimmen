@@ -12,9 +12,51 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Vogel-Bausteine: Farben kommen über CSS-Variablen (--c1 Körper, --c2 Bauch, --c3 Flügel) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="bird" viewBox="0 0 64 64">
+    <path style="fill:var(--c1)" d="M30 13 q-3 -7 1 -9 q0 5 3 8 q0 -6 4 -7 q-2 5 0 9 z"/>
+    <path style="fill:var(--c1)" d="M30 12 q4 -3 8 0 q5 -1 7 3 q5 1 6 6 q4 3 3 8 q3 4 0 8 q1 5 -3 7 q-1 5 -6 6 q-3 4 -8 3 q-4 3 -8 0 q-5 1 -7 -3 q-5 -1 -6 -6 q-4 -3 -3 -8 q-3 -4 0 -8 q-1 -5 3 -7 q1 -5 6 -6 q3 -4 8 -3 z"/>
+    <ellipse cx="27" cy="22" rx="9" ry="6" fill="#fff" opacity=".22"/>
+    <path style="fill:var(--c2)" d="M22 38 q2 -4 6 -3 q3 -3 7 -1 q4 -2 6 2 q4 1 3 5 q1 5 -4 7 q-3 4 -8 3 q-5 1 -7 -3 q-4 -2 -3 -6 z"/>
+    <path style="fill:var(--c3)" d="M16 36 q2 -8 10 -6 q-2 6 -6 10 q-3 1 -4 -4 z"/>
+    <circle cx="38" cy="25" r="4.2" fill="#fff"/><circle cx="39" cy="25.5" r="2.6" fill="#1f2a22"/><circle cx="40" cy="24.4" r=".9" fill="#fff"/>
+    <circle cx="44" cy="31" r="2.3" fill="#ff9aa2" opacity=".7"/>
+    <path style="fill:var(--beak,#f6b72c)" d="M47 25 l11 -3 l-9 5 z"/><path fill="#e39a12" d="M47 28 l10 3 l-10 -1 z"/>
+    <path stroke="#e39a12" stroke-width="2" stroke-linecap="round" fill="none" d="M27 53 v4 M35 53 v4"/>
+  </symbol>
+  <symbol id="bird-fly" viewBox="0 0 64 48">
+    <path style="fill:var(--c3)" d="M26 26 q-14 -22 -24 -18 q8 6 12 20 z"/>
+    <ellipse cx="32" cy="30" rx="15" ry="12" style="fill:var(--c1)"/>
+    <ellipse cx="30" cy="35" rx="9" ry="6" style="fill:var(--c2)"/>
+    <path style="fill:var(--c3)" d="M34 25 q10 -22 24 -20 q-10 8 -16 22 z"/>
+    <circle cx="40" cy="27" r="2.6" fill="#fff"/><circle cx="40.6" cy="27.3" r="1.5" fill="#1f2a22"/>
+    <path fill="#f6b72c" d="M46 29 l8 -1 l-7 4 z"/>
+  </symbol>
+</svg>
+
+<!-- fliegende Vögel im Hintergrund -->
+<div class="sky" aria-hidden="true">
+  <svg class="fly f1" style="--c1:#4a90d9;--c2:#ffe066;--c3:#2f6fb5"><use href="#bird-fly"/></svg>
+  <svg class="fly f2" style="--c1:#ef8354;--c2:#ffd6a5;--c3:#c0583a"><use href="#bird-fly"/></svg>
+  <svg class="fly f3" style="--c1:#9b7fd4;--c2:#f3c4e8;--c3:#6c55a8"><use href="#bird-fly"/></svg>
+  <svg class="fly f4" style="--c1:#f4c430;--c2:#fff1b8;--c3:#c9971c"><use href="#bird-fly"/></svg>
+  <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
+</div>
 <main>
-  <header>
-    <h1><img src="favicon.svg" alt="" class="logo"> Welcher Vogel singt da?</h1>
+  <header class="hero">
+    <svg class="scene" viewBox="0 0 360 120" aria-hidden="true">
+      <path d="M-10 92 C 60 80, 120 98, 190 86 S 320 70, 380 84" stroke="#7a5236" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M250 80 q 18 -14 34 -12" stroke="#7a5236" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <g fill="#6fae5a"><ellipse cx="40" cy="92" rx="10" ry="5" transform="rotate(25 40 92)"/><ellipse cx="150" cy="99" rx="11" ry="5" transform="rotate(-20 150 99)"/>
+        <ellipse cx="286" cy="66" rx="10" ry="5" transform="rotate(-30 286 66)"/><ellipse cx="330" cy="86" rx="10" ry="5" transform="rotate(20 330 86)"/></g>
+      <g fill="#8fc77a"><ellipse cx="96" cy="96" rx="9" ry="4.5" transform="rotate(-25 96 96)"/><ellipse cx="220" cy="82" rx="9" ry="4.5" transform="rotate(30 220 82)"/></g>
+      <use href="#bird" class="perch p1" x="22" y="34" width="56" height="56" style="--c1:#4a90d9;--c2:#ffe066;--c3:#2f6fb5"/>
+      <use href="#bird" class="perch p2" x="140" y="20" width="68" height="68" style="--c1:#7fae6b;--c2:#f6b26b;--c3:#4b7744"/>
+      <use href="#bird" class="perch p3" x="262" y="30" width="54" height="54" style="--c1:#8c6a4f;--c2:#f07a3a;--c3:#6d4f38"/>
+      <g class="notes" fill="#2f5d3a"><text x="205" y="30" font-size="18">♪</text><text x="222" y="18" font-size="14">♫</text><text x="80" y="36" font-size="14">♪</text></g>
+    </svg>
+    <h1>Welcher Vogel singt da?</h1>
     <p class="sub">Nimm eine Vogelstimme auf oder lade eine Aufnahme hoch.</p>
   </header>
 
@@ -24,12 +66,12 @@
   </nav>
 
   <div id="viewIdentify">
-  <section class="card">
+  <section class="card main-card">
+    <svg class="peek" aria-hidden="true" style="--c1:#ef5d6a;--c2:#ffd3d8;--c3:#b8384a"><use href="#bird"/></svg>
     <button id="recBtn" class="rec" aria-label="Aufnahme starten">
       <span class="dot"></span><span id="recLabel">Aufnahme starten</span>
     </button>
-    <canvas id="level" width="600" height="60" hidden></canvas>
-    <div id="timer" class="timer" hidden>0:00</div>
+    <p id="deviceHint" class="device-hint"></p>
 
     <div class="or">oder</div>
 
@@ -58,7 +100,7 @@
   <section id="status" class="status" hidden></section>
 
   <section id="results" hidden>
-    <h2>Ergebnis</h2>
+    <h2 class="with-bird"><svg class="mini" aria-hidden="true" style="--c1:#f4c430;--c2:#fff1b8;--c3:#c9971c"><use href="#bird"/></svg> Ergebnis</h2>
     <p id="filterInfo" class="hint"></p>
     <ol id="resultList" class="results"></ol>
     <p id="noiseInfo" class="hint"></p>
@@ -89,7 +131,7 @@
         <textarea id="detailNote" rows="2" placeholder="z. B. Verhalten, Wetter, Anzahl …"></textarea>
       </label>
     </section>
-    <h2>Erkannte Vögel</h2>
+    <h2 class="with-bird"><svg class="mini" aria-hidden="true" style="--c1:#9b7fd4;--c2:#f3c4e8;--c3:#6c55a8"><use href="#bird"/></svg> Erkannte Vögel</h2>
     <p class="hint">Tippe auf „Gesehen“, wenn du den Vogel auch gesehen hast.</p>
     <ol id="detailResults" class="results"></ol>
     <p id="detailNoise" class="hint"></p>
@@ -102,10 +144,33 @@
     Tipp: 10–30 Sekunden aufnehmen, Handy in Richtung Vogel halten, möglichst wenig Nebengeräusche.
   </footer>
 </main>
+
+<!-- Vollbild während der Aufnahme: Pfeil zum Mikrofon -->
+<div id="recOverlay" class="rec-overlay" hidden>
+  <div id="roInner" class="ro-inner">
+    <div class="ro-arrow" aria-hidden="true">
+      <div class="ro-mic-label">🎤 Mikrofon · zum Vogel halten</div>
+      <svg viewBox="0 0 100 120" class="arrow-svg"><path d="M50 118 L10 70 H34 V4 H66 V70 H90 Z"/></svg>
+    </div>
+    <div class="ro-content">
+      <div class="ro-device"><span id="roDevice"></span></div>
+      <div id="roWhere" class="ro-where"></div>
+      <p id="roHint" class="ro-hint"></p>
+      <div class="ro-live">
+        <svg class="ro-bird" aria-hidden="true" style="--c1:#7fae6b;--c2:#f6b26b;--c3:#4b7744"><use href="#bird"/></svg>
+        <div id="timer" class="timer">0:00</div>
+      </div>
+      <canvas id="level" width="600" height="80"></canvas>
+      <button id="stopBtn" class="rec recording"><span class="dot"></span>Aufnahme beenden</button>
+      <button id="flipBtn" class="flip">🔄 Anzeige drehen</button>
+    </div>
+  </div>
+</div>
 <script src="vendor/tf.min.js"></script>
 <script src="vendor/tf-backend-wasm.min.js"></script>
 <script src="birdnet.js"></script>
 <script src="history.js"></script>
+<script src="mic.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
