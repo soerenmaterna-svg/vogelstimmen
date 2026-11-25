@@ -162,9 +162,7 @@ audio { width: 100%; }
 
 footer { margin-top: 32px; font-size: .8rem; color: var(--muted); text-align: center; }
 footer a { color: var(--green); }
-.credits { margin: 10px auto; max-width: 480px; text-align: left; }
-.credits summary { cursor: pointer; text-align: center; }
-.credits ul { padding-left: 18px; margin: 6px 0; }
+.info-link { margin-top: 8px; font-size: .75rem; }
 
 /* ---------- Vollbild während der Aufnahme ---------- */
 .rec-overlay {
