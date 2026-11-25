@@ -67,6 +67,9 @@ danach liegt es im Browser-Cache.
 
 Lokal testen: im Ordner `python3 -m http.server` starten und <http://localhost:8000> öffnen.
 
+Vor dem Hochladen von Änderungen `python3 tools/version.py` ausführen: Das hängt eine neue
+Versionsnummer an alle Dateien, damit Browser keine veralteten Dateien aus dem Zwischenspeicher nehmen.
+
 Daten neu erzeugen (Python 3.10+):
 
 ```bash
