@@ -56,7 +56,9 @@ const MicGuide = (() => {
   // ---------- Vollbild-Anzeige während der Aufnahme ----------
   const overlay = document.getElementById("recOverlay");
   const inner = document.getElementById("roInner");
+  const arrow = document.getElementById("roArrow");
   const flipBtn = document.getElementById("flipBtn");
+  const SIDES = ["top", "right", "bottom", "left"]; // im Uhrzeigersinn
   let device = null, flipped = false, manual = false, listening = false;
 
   const ready = detect().then((d) => {
@@ -67,19 +69,38 @@ const MicGuide = (() => {
     return d;
   });
 
-  function setFlipped(on) {
-    flipped = on;
-    inner.classList.toggle("flipped", on);
+  /** Wie weit hat das Betriebssystem die Anzeige gedreht? 0, 90, 180 oder 270 Grad */
+  function screenAngle() {
+    let a = screen.orientation?.angle;
+    if (a == null) a = window.orientation ?? 0; // ältere iPhones/iPads
+    return ((Math.round(a / 90) * 90) % 360 + 360) % 360;
   }
 
-  // Lage des Geräts: beta ~ +90° aufrecht, ~0° flach, negativ = Oberkante zeigt nach unten
+  /**
+   * Pfeil an die Bildschirmseite setzen, an der das Mikrofon tatsächlich sitzt.
+   * Dreht das Gerät die Anzeige um a Grad (Querformat, kopfüber), wandert die
+   * Mikrofon-Seite auf dem Bildschirm entsprechend mit.
+   */
+  function update() {
+    if (!device) return;
+    const a = screenAngle();
+    const deviceSide = SIDES.indexOf(device.edge);
+    const side = SIDES[(deviceSide - a / 90 + 8) % 4];
+    if (a !== 0 && !manual) flipped = false; // das Betriebssystem hat schon gedreht
+    for (const s of SIDES) {
+      overlay.classList.toggle(`side-${s}`, s === side);
+    }
+    inner.classList.toggle("flipped", flipped);
+    arrow.classList.toggle("flipped", flipped);
+  }
+
+  // Lage des Geräts: beta ~ +90° aufrecht, ~0° flach, negativ = Oberkante zeigt nach unten.
+  // Bleibt die Anzeige im Hochformat stehen (z. B. Drehsperre, iPhone kopfüber), drehen
+  // wir den Inhalt selbst um 180°, damit man ihn lesen kann. Der Pfeil bleibt dabei am Mikrofon.
   function onOrientation(e) {
-    if (manual || e.beta == null) return;
-    // Nur bei Mikrofon unten: wird das Handy mit der Unterseite nach vorne/oben gehalten,
-    // steht die Schrift für den Anwender auf dem Kopf -> Anzeige drehen
-    if (device?.edge !== "bottom") return;
-    if (e.beta < -12 && !flipped) setFlipped(true);
-    else if (e.beta > 25 && flipped) setFlipped(false);
+    if (manual || e.beta == null || screenAngle() !== 0) return;
+    if (e.beta < -12 && !flipped) { flipped = true; update(); }
+    else if (e.beta > 25 && flipped) { flipped = false; update(); }
   }
 
   /** Muss direkt im Klick-Handler aufgerufen werden (iOS fragt sonst nicht nach der Erlaubnis) */
@@ -93,22 +114,22 @@ const MicGuide = (() => {
 
   async function show() {
     const d = device || await ready;
-    overlay.classList.toggle("mic-top", d.edge === "top");
-    overlay.classList.toggle("mic-bottom", d.edge === "bottom");
     document.getElementById("roDevice").textContent = `${d.type === "desktop" ? "💻" : "📱"} ${d.name}`;
     document.getElementById("roWhere").textContent = `Mikrofon ${d.where}`;
     document.getElementById("roHint").textContent = d.canFlip
-      ? (d.edge === "bottom"
-        ? "Halte diese Seite des Handys in Richtung Vogel. Die Anzeige dreht sich mit, damit du sie lesen kannst."
-        : "Halte diese Seite des Geräts in Richtung Vogel.")
+      ? "Halte die Seite, auf die der Pfeil zeigt, in Richtung Vogel. Der Pfeil zeigt immer zum Mikrofon – auch wenn du das Gerät drehst."
       : "Richte das Mikrofon auf den Vogel und sei möglichst leise.";
     flipBtn.hidden = !d.canFlip;
     manual = false;
-    setFlipped(false);
+    flipped = false;
+    update();
     overlay.hidden = false;
     document.body.classList.add("no-scroll");
-    if (d.canFlip && !listening) {
-      window.addEventListener("deviceorientation", onOrientation);
+    if (!listening) {
+      if (d.canFlip) window.addEventListener("deviceorientation", onOrientation);
+      screen.orientation?.addEventListener?.("change", update);
+      window.addEventListener("orientationchange", update);
+      window.addEventListener("resize", update);
       listening = true;
     }
   }
@@ -116,10 +137,16 @@ const MicGuide = (() => {
   function hide() {
     overlay.hidden = true;
     document.body.classList.remove("no-scroll");
-    if (listening) { window.removeEventListener("deviceorientation", onOrientation); listening = false; }
+    if (listening) {
+      window.removeEventListener("deviceorientation", onOrientation);
+      screen.orientation?.removeEventListener?.("change", update);
+      window.removeEventListener("orientationchange", update);
+      window.removeEventListener("resize", update);
+      listening = false;
+    }
   }
 
-  flipBtn.addEventListener("click", () => { manual = true; setFlipped(!flipped); });
+  flipBtn.addEventListener("click", () => { manual = true; flipped = !flipped; update(); });
 
   return { ready, show, hide, requestSensor };
 })();

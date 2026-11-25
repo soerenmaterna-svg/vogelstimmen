@@ -19,7 +19,8 @@ danach liegt es im Browser-Cache.
 - **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
   und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist und welche Seite zum
   Vogel zeigen soll. Hält man das Handy mit dem Mikrofon nach vorne/oben, dreht sich die Anzeige
-  automatisch um 180°, damit sie lesbar bleibt (oder per Knopf „Anzeige drehen“).
+  automatisch um 180°, damit sie lesbar bleibt (oder per Knopf „Schrift drehen“). Dreht das
+  Gerät die Anzeige selbst (Querformat, kopfüber), wandert der Pfeil mit und zeigt weiter zum Mikrofon.
   Hinweis: Browser verraten die genaue Mikrofon-Lage nicht; die App nutzt die typische Lage
   (Handys unten an der Ladebuchse, Tablets und Laptops oben).
 - Hochladen von Aufnahmen (mp3, m4a, wav, ogg, flac, webm …)
