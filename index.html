@@ -18,6 +18,12 @@
     <p class="sub">Nimm eine Vogelstimme auf oder lade eine Aufnahme hoch.</p>
   </header>
 
+  <nav class="tabs">
+    <button id="tabIdentify" class="tab active">🎙️ Bestimmen</button>
+    <button id="tabHistory" class="tab">📒 Meine Funde <span id="historyCount"></span></button>
+  </nav>
+
+  <div id="viewIdentify">
   <section class="card">
     <button id="recBtn" class="rec" aria-label="Aufnahme starten">
       <span class="dot"></span><span id="recLabel">Aufnahme starten</span>
@@ -34,7 +40,7 @@
 
     <label class="check">
       <input id="geoCheck" type="checkbox" checked>
-      Standort verwenden: Arten bevorzugen, die hier zu dieser Jahreszeit vorkommen (sonst alle europäischen Arten)
+      Standort für die Bestimmung nutzen: Arten bevorzugen, die hier zu dieser Jahreszeit vorkommen (sonst alle europäischen Arten)
     </label>
     <label class="check">
       <input id="exoticsCheck" type="checkbox" checked>
@@ -56,17 +62,50 @@
     <p id="filterInfo" class="hint"></p>
     <ol id="resultList" class="results"></ol>
     <p id="noiseInfo" class="hint"></p>
+    <p id="savedInfo" class="saved" hidden>💾 Im Verlauf unter „Meine Funde“ gespeichert.
+      <button id="openSaved" class="link">Fund öffnen</button></p>
   </section>
+  </div>
+
+  <div id="viewHistory" hidden>
+    <div class="history-tools">
+      <label class="check"><input id="onlyConfirmed" type="checkbox"> nur Funde mit bestätigter Sichtung</label>
+      <button id="exportBtn" class="secondary">⬇️ Als Tabelle (CSV) exportieren</button>
+    </div>
+    <ul id="historyList" class="history"></ul>
+    <p class="hint">Deine Funde werden nur auf diesem Gerät im Browser gespeichert. Den Ortsnamen
+      ermittelt die App über OpenStreetMap.</p>
+  </div>
+
+  <div id="viewDetail" hidden>
+    <button id="backBtn" class="link">← Zurück zu „Meine Funde“</button>
+    <section class="card detail">
+      <div class="detail-head">
+        <div id="detailDate" class="detail-date"></div>
+        <div id="detailPlace" class="detail-place"></div>
+      </div>
+      <audio id="detailPlayer" controls></audio>
+      <label class="note">Notiz
+        <textarea id="detailNote" rows="2" placeholder="z. B. Verhalten, Wetter, Anzahl …"></textarea>
+      </label>
+    </section>
+    <h2>Erkannte Vögel</h2>
+    <p class="hint">Tippe auf „Gesehen“, wenn du den Vogel auch gesehen hast.</p>
+    <ol id="detailResults" class="results"></ol>
+    <p id="detailNoise" class="hint"></p>
+    <button id="deleteBtn" class="danger">🗑️ Fund löschen</button>
+  </div>
 
   <footer>
     Erkennung mit <a href="https://birdnet.cornell.edu/" target="_blank" rel="noopener">BirdNET</a>
-    (Cornell Lab of Ornithology &amp; TU Chemnitz), Modell lizenziert unter CC BY-NC 4.0 (nur nicht-kommerzielle Nutzung). Die Analyse läuft komplett auf deinem Gerät, es werden keine Aufnahmen hochgeladen.<br>
+    (Cornell Lab of Ornithology &amp; TU Chemnitz), Modell lizenziert unter CC BY-NC 4.0 (nur nicht-kommerzielle Nutzung). Die Analyse läuft komplett auf deinem Gerät, Aufnahmen und Funde bleiben auf diesem Gerät. Nur für den Ortsnamen wird der Standort an OpenStreetMap geschickt.<br>
     Tipp: 10–30 Sekunden aufnehmen, Handy in Richtung Vogel halten, möglichst wenig Nebengeräusche.
   </footer>
 </main>
 <script src="vendor/tf.min.js"></script>
 <script src="vendor/tf-backend-wasm.min.js"></script>
 <script src="birdnet.js"></script>
+<script src="history.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

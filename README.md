@@ -6,8 +6,9 @@ Vogelstimme mit dem Handy aufnehmen oder Audiodatei hochladen – die App zeigt,
 das ist und wie sicher sie sich ist (in Prozent).
 
 Die Erkennung läuft mit [BirdNET](https://birdnet.cornell.edu/) (Cornell Lab of Ornithology &
-TU Chemnitz) **komplett im Browser auf deinem Gerät**. Es gibt keinen Server, und es werden keine
-Aufnahmen hochgeladen. Beim ersten Öffnen lädt die App das Erkennungsmodell (ca. 26 MB),
+TU Chemnitz) **komplett im Browser auf deinem Gerät**. Es gibt keinen Server. Aufnahmen und Funde
+werden nur im Browser auf deinem Gerät gespeichert (IndexedDB); nur für den Ortsnamen wird der
+Standort an OpenStreetMap geschickt. Beim ersten Öffnen lädt die App das Erkennungsmodell (ca. 26 MB),
 danach liegt es im Browser-Cache.
 
 <img src="vorschau.png" width="300" alt="Vorschau der App">
@@ -30,6 +31,12 @@ danach liegt es im Browser-Cache.
   | Möglicher Irrgast | Art von außerhalb Europas | 50 % |
 
 - Störgeräusche (Motor, Stimmen, Hund …) werden gemeldet
+- **Meine Funde (Verlauf):** Jede Bestimmung wird mit Aufnahme, Datum, Uhrzeit und Fundort
+  (Koordinaten, Ortsname über OpenStreetMap, Kartenlink) gespeichert. Pro Fund gibt es eine
+  Notiz, und man kann die Aufnahme jederzeit wieder anhören.
+- **„Gesehen“-Knopf:** Bei jedem erkannten Vogel lässt sich bestätigen, dass man ihn auch
+  gesehen hat. Im Verlauf kann man nach bestätigten Sichtungen filtern.
+- **Export:** Alle Funde als Tabelle (CSV, öffnet sich in Excel/LibreOffice)
 - Lässt sich über „Zum Startbildschirm hinzufügen“ wie eine App aufs Handy legen
 
 ## Tipps für gute Ergebnisse
@@ -45,6 +52,7 @@ danach liegt es im Browser-Cache.
 |---|---|
 | `index.html`, `app.js`, `style.css` | Oberfläche (Aufnahme, Upload, Ergebnisse) |
 | `birdnet.js` | Erkennung: Audio einlesen, Spektrogramm, Modell, Bewertung |
+| `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, CSV-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
 | `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge |
 | `vendor/` | TensorFlow.js 4.22 mit WebAssembly-Backend |
