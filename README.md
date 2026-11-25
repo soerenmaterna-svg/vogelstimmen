@@ -17,11 +17,11 @@ danach liegt es im Browser-Cache.
 
 - Aufnahme direkt im Browser mit buntem Live-Spektrum (bis 2 Minuten), danach automatische Analyse
 - **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
-  und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist und welche Seite zum
-  Vogel zeigen soll. Hält man das Handy mit dem Mikrofon nach vorne/oben, dreht sich die Anzeige
-  automatisch um 180°, damit sie lesbar bleibt (oder per Knopf „Schrift drehen“). Dreht das
-  Gerät die Anzeige selbst (Querformat, kopfüber), wandert der Pfeil mit und zeigt weiter zum Mikrofon. War die Anzeige beim Beenden gedreht,
-  erscheint auch das Ergebnis gedreht, bis man das Handy wieder normal hält.
+  und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist. Dreht das Gerät die
+  Anzeige (Querformat, kopfüber), wandert der Pfeil mit. Timer und Knöpfe stehen im Vollbild
+  zweimal da – einmal auf dem Kopf –, damit sie immer lesbar sind, egal wie man das Handy hält.
+  Nach der Analyse tippt man in der lesbaren Hälfte auf „Ergebnis anzeigen“; die Ergebnisseite
+  erscheint dann in genau dieser Richtung.
   Hinweis: Browser verraten die genaue Mikrofon-Lage nicht; die App nutzt die typische Lage
   (Handys unten an der Ladebuchse, Tablets und Laptops oben).
 - Hochladen von Aufnahmen (mp3, m4a, wav, ogg, flac, webm …)
@@ -62,7 +62,7 @@ danach liegt es im Browser-Cache.
 |---|---|
 | `index.html`, `app.js`, `style.css` | Oberfläche (Aufnahme, Upload, Ergebnisse) |
 | `birdnet.js` | Erkennung: Audio einlesen, Spektrogramm, Modell, Bewertung |
-| `mic.js` | Geräteerkennung, Mikrofon-Pfeil, automatisches Drehen der Anzeige |
+| `mic.js` | Geräteerkennung, Mikrofon-Pfeil, Aufnahme-Vollbild in beide Richtungen |
 | `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, CSV-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
 | `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge |

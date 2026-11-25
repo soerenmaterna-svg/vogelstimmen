@@ -53,13 +53,13 @@ const MicGuide = (() => {
       where: "meist über dem Bildschirm, neben der Kamera (oder am externen Mikrofon)" };
   }
 
-  // ---------- Vollbild-Anzeige während der Aufnahme ----------
+  // ---------- Vollbild während Aufnahme und Analyse ----------
+  // Alles Wichtige steht zweimal da: unten richtig herum, oben auf dem Kopf. So ist es
+  // immer lesbar, egal wie das Handy gehalten wird – ohne auf Lagesensoren angewiesen zu sein.
   const overlay = document.getElementById("recOverlay");
-  const inner = document.getElementById("roInner");
-  const arrow = document.getElementById("roArrow");
-  const flipBtn = document.getElementById("flipBtn");
+  const halves = [...overlay.querySelectorAll(".ro-half")];
   const SIDES = ["top", "right", "bottom", "left"]; // im Uhrzeigersinn
-  let device = null, flipped = false, manual = false, listening = false;
+  let device = null, active = false, onButton = null;
 
   const ready = detect().then((d) => {
     device = d;
@@ -76,32 +76,86 @@ const MicGuide = (() => {
     return ((Math.round(a / 90) * 90) % 360 + 360) % 360;
   }
 
-  /**
-   * Pfeil an die Bildschirmseite setzen, an der das Mikrofon tatsächlich sitzt.
-   * Dreht das Gerät die Anzeige um a Grad (Querformat, kopfüber), wandert die
-   * Mikrofon-Seite auf dem Bildschirm entsprechend mit.
-   */
-  function update() {
+  /** Pfeil an die Bildschirmseite setzen, an der das Mikrofon tatsächlich sitzt */
+  function placeArrow() {
     if (!device) return;
-    const a = screenAngle();
-    const deviceSide = SIDES.indexOf(device.edge);
-    const side = SIDES[(deviceSide - a / 90 + 8) % 4];
-    if (a !== 0 && !manual) flipped = false; // das Betriebssystem hat schon gedreht
-    for (const s of SIDES) {
-      overlay.classList.toggle(`side-${s}`, s === side);
-    }
-    inner.classList.toggle("flipped", flipped);
-    arrow.classList.toggle("flipped", flipped);
+    const side = SIDES[(SIDES.indexOf(device.edge) - screenAngle() / 90 + 8) % 4];
+    for (const s of SIDES) overlay.classList.toggle(`side-${s}`, s === side);
   }
 
-  // Lage des Geräts: beta ~ +90° aufrecht, ~0° flach, negativ = Oberkante zeigt nach unten.
-  // Bleibt die Anzeige im Hochformat stehen (z. B. Drehsperre, iPhone kopfüber), drehen
-  // wir den Inhalt selbst um 180°, damit man ihn lesen kann. Der Pfeil bleibt dabei am Mikrofon.
-  function onOrientation(e) {
-    if (manual || e.beta == null || screenAngle() !== 0) return;
-    if (e.beta < -12 && !flipped) { flipped = true; update(); }
-    else if (e.beta > 25 && flipped) { flipped = false; update(); }
+  function each(sel, fn) { halves.forEach((h) => fn(h.querySelector(sel), h)); }
+
+  function setButton(label, show, kind) {
+    each(".ro-btn", (b) => {
+      b.hidden = !show;
+      b.className = "ro-btn " + (kind === "stop" ? "rec recording" : "primary");
+      b.querySelector(".ro-btn-label").textContent = label;
+      b.querySelector(".dot").hidden = kind !== "stop";
+    });
   }
+
+  /** Aufnahme-Ansicht öffnen. onStop wird beim Tippen auf "Aufnahme beenden" aufgerufen */
+  async function show(onStop) {
+    const d = device || await ready;
+    unflipPage();
+    overlay.classList.toggle("single", d.type === "desktop"); // am Computer reicht eine Hälfte
+    each(".ro-device", (el) => { el.textContent = `${d.type === "desktop" ? "💻" : "📱"} ${d.name}`; });
+    each(".ro-status", (el) => { el.textContent = "Der Pfeil zeigt zum Mikrofon – diese Seite zum Vogel halten."; });
+    each(".ro-timer", (el) => { el.hidden = false; el.textContent = "0:00"; });
+    each(".ro-result", (el) => { el.hidden = true; el.textContent = ""; });
+    setButton("Aufnahme beenden", true, "stop");
+    onButton = () => onStop?.();
+    placeArrow();
+    overlay.classList.remove("done");
+    overlay.hidden = false;
+    active = true;
+    document.body.classList.add("no-scroll");
+    screen.orientation?.addEventListener?.("change", placeArrow);
+    window.addEventListener("orientationchange", placeArrow);
+    window.addEventListener("resize", placeArrow);
+  }
+
+  halves.forEach((h) => h.querySelector(".ro-btn").addEventListener("click", () => {
+    const fn = onButton;
+    onButton = null;
+    fn?.(h.classList.contains("upside") ? "upside" : "upright");
+  }));
+
+  function setTimer(text) { each(".ro-timer", (el) => { el.textContent = text; }); }
+
+  /** Während der Analyse: Statuszeile in beiden Hälften */
+  function setStatus(text) {
+    if (!active) return;
+    each(".ro-timer", (el) => { el.hidden = true; });
+    each(".ro-status", (el) => { el.textContent = text; });
+    setButton("", false);
+  }
+
+  /**
+   * Ergebnis kurz in beiden Hälften zeigen. Löst auf, sobald in einer Hälfte auf
+   * "Ergebnis anzeigen" getippt wird – mit der Richtung dieser Hälfte ("upright"/"upside").
+   */
+  function finish(statusText, resultText, buttonLabel = "Ergebnis anzeigen") {
+    if (!active) return Promise.resolve("upright");
+    overlay.classList.add("done");
+    each(".ro-timer", (el) => { el.hidden = true; });
+    each(".ro-status", (el) => { el.textContent = statusText; });
+    each(".ro-result", (el) => { el.hidden = !resultText; el.textContent = resultText || ""; });
+    setButton(buttonLabel, true, "go");
+    return new Promise((resolve) => { onButton = resolve; });
+  }
+
+  function hide() {
+    overlay.hidden = true;
+    active = false;
+    onButton = null;
+    document.body.classList.remove("no-scroll");
+    screen.orientation?.removeEventListener?.("change", placeArrow);
+    window.removeEventListener("orientationchange", placeArrow);
+    window.removeEventListener("resize", placeArrow);
+  }
+
+  const isActive = () => active;
 
   /** Muss direkt im Klick-Handler aufgerufen werden (iOS fragt sonst nicht nach der Erlaubnis) */
   function requestSensor() {
@@ -112,45 +166,7 @@ const MicGuide = (() => {
     return Promise.resolve("granted");
   }
 
-  async function show() {
-    const d = device || await ready;
-    document.getElementById("roDevice").textContent = `${d.type === "desktop" ? "💻" : "📱"} ${d.name}`;
-    document.getElementById("roWhere").textContent = `Mikrofon ${d.where}`;
-    document.getElementById("roHint").textContent = d.canFlip
-      ? "Halte die Seite, auf die der Pfeil zeigt, in Richtung Vogel. Der Pfeil zeigt immer zum Mikrofon – auch wenn du das Gerät drehst."
-      : "Richte das Mikrofon auf den Vogel und sei möglichst leise.";
-    flipBtn.hidden = !d.canFlip;
-    manual = false;
-    flipped = false;
-    update();
-    overlay.hidden = false;
-    document.body.classList.add("no-scroll");
-    if (!listening) {
-      if (d.canFlip) window.addEventListener("deviceorientation", onOrientation);
-      screen.orientation?.addEventListener?.("change", update);
-      window.addEventListener("orientationchange", update);
-      window.addEventListener("resize", update);
-      listening = true;
-    }
-  }
-
-  function hide() {
-    const keepFlipped = flipped && screenAngle() === 0;
-    overlay.hidden = true;
-    document.body.classList.remove("no-scroll");
-    if (listening) {
-      window.removeEventListener("deviceorientation", onOrientation);
-      screen.orientation?.removeEventListener?.("change", update);
-      window.removeEventListener("orientationchange", update);
-      window.removeEventListener("resize", update);
-      listening = false;
-    }
-    // War die Anzeige gedreht, bleibt auch die Ergebnisseite gedreht, bis das Handy
-    // wieder normal gehalten wird (oder man auf "Normal anzeigen" tippt)
-    if (keepFlipped) flipPage();
-  }
-
-  // ---------- gedrehte Seite nach der Aufnahme ----------
+  // ---------- Ergebnisseite auf dem Kopf (wenn in der gedrehten Hälfte getippt wurde) ----------
   function flipPage() {
     document.body.classList.add("page-flipped");
     document.querySelector("main").scrollTop = 0;
@@ -168,14 +184,15 @@ const MicGuide = (() => {
     anchor?.scrollIntoView({ block: "start" });
   }
 
+  // Zurückdrehen, sobald die Oberkante des Handys deutlich nach oben zeigt
   function onPageOrientation(e) {
-    if (e.beta != null && e.beta > 25) unflipPage(); // Handy wieder normal gehalten
+    if (e.beta == null) return;
+    const up = Math.sin((e.beta * Math.PI) / 180); // Anteil "Oberkante oben"
+    if (up > 0.5) unflipPage();
   }
 
   document.getElementById("unflipBtn").addEventListener("click", unflipPage);
   const isPageFlipped = () => document.body.classList.contains("page-flipped");
 
-  flipBtn.addEventListener("click", () => { manual = true; flipped = !flipped; update(); });
-
-  return { ready, show, hide, requestSensor, isPageFlipped, unflipPage };
+  return { ready, show, hide, finish, setStatus, setTimer, isActive, requestSensor, flipPage, unflipPage, isPageFlipped };
 })();

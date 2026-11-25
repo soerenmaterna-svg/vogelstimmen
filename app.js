@@ -1,7 +1,7 @@
 "use strict";
 
 const $ = (id) => document.getElementById(id);
-const recBtn = $("recBtn"), recLabel = $("recLabel"), timerEl = $("timer"), levelCanvas = $("level");
+const recBtn = $("recBtn"), recLabel = $("recLabel"), levelCanvas = $("level");
 const fileInput = $("fileInput"), geoCheck = $("geoCheck"), exoticsCheck = $("exoticsCheck");
 const playerCard = $("playerCard"), player = $("player"), analyzeBtn = $("analyzeBtn");
 const statusEl = $("status"), resultsEl = $("results"), resultList = $("resultList");
@@ -14,6 +14,7 @@ let recorder = null, stream = null, audioCtx = null, rafId = null, timerId = nul
 // ---------- Ansichten ----------
 const views = { identify: $("viewIdentify"), history: $("viewHistory"), detail: $("viewDetail") };
 function showView(name) {
+  MicGuide.unflipPage();
   for (const [k, el] of Object.entries(views)) el.hidden = k !== name;
   $("tabIdentify").classList.toggle("active", name === "identify");
   $("tabHistory").classList.toggle("active", name !== "identify");
@@ -54,7 +55,7 @@ async function startRecording() {
   };
   recorder.start(1000);
   startedAt = Date.now();
-  MicGuide.show();
+  MicGuide.show(stopRecording);
   timerId = setInterval(tick, 250);
   tick();
   drawLevel();
@@ -64,7 +65,7 @@ async function startRecording() {
 
 function tick() {
   const s = Math.floor((Date.now() - startedAt) / 1000);
-  timerEl.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  MicGuide.setTimer(`${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`);
   if (s >= MAX_REC_SECONDS) stopRecording();
 }
 
@@ -79,9 +80,8 @@ function cleanupRecording() {
   audioCtx?.close();
   recorder = stream = audioCtx = null;
   recLabel.textContent = "Neue Aufnahme starten";
-  MicGuide.hide();
+  MicGuide.setStatus("Aufnahme wird ausgewertet …");
 }
-$("stopBtn").addEventListener("click", stopRecording);
 
 function drawLevel() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -179,9 +179,15 @@ async function analyze() {
       console.warn("Speichern im Verlauf fehlgeschlagen:", e);
     }
     renderResults(data, saved ? entry : null);
+    if (MicGuide.isActive()) {
+      const top = data.results[0];
+      const summary = top ? `🐦 ${top.name} · ${Math.round(top.confidence)} %` : "Kein Vogel sicher erkannt";
+      await closeOverlay(await MicGuide.finish("Fertig!", summary));
+    }
   } catch (e) {
     console.error(e);
     showError(e.message || String(e));
+    if (MicGuide.isActive()) await closeOverlay(await MicGuide.finish(e.message || String(e), null, "OK"));
   } finally {
     analyzeBtn.disabled = false;
   }
@@ -500,7 +506,17 @@ $("deleteAllBtn").addEventListener("click", async () => {
 });
 
 // ---------- Hilfsfunktionen ----------
+// Vollbild schließen und die Seite so anzeigen, wie das Handy gerade gehalten wird
+// (die Hälfte, in der getippt wurde, verrät die Richtung)
+async function closeOverlay(direction) {
+  MicGuide.hide();
+  if (direction === "upside") MicGuide.flipPage();
+  const target = resultsEl.hidden ? statusEl : resultsEl;
+  target.scrollIntoView({ block: "start" });
+}
+
 function showStatus(text) {
+  MicGuide.setStatus(text);
   statusEl.className = "status";
   statusEl.innerHTML = `<span class="spinner"></span>`;
   statusEl.append(text);
