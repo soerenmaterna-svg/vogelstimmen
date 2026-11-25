@@ -135,6 +135,7 @@ const MicGuide = (() => {
   }
 
   function hide() {
+    const keepFlipped = flipped && screenAngle() === 0;
     overlay.hidden = true;
     document.body.classList.remove("no-scroll");
     if (listening) {
@@ -144,9 +145,37 @@ const MicGuide = (() => {
       window.removeEventListener("resize", update);
       listening = false;
     }
+    // War die Anzeige gedreht, bleibt auch die Ergebnisseite gedreht, bis das Handy
+    // wieder normal gehalten wird (oder man auf "Normal anzeigen" tippt)
+    if (keepFlipped) flipPage();
   }
+
+  // ---------- gedrehte Seite nach der Aufnahme ----------
+  function flipPage() {
+    document.body.classList.add("page-flipped");
+    document.querySelector("main").scrollTop = 0;
+    window.addEventListener("deviceorientation", onPageOrientation);
+    screen.orientation?.addEventListener?.("change", unflipPage);
+  }
+
+  function unflipPage() {
+    if (!document.body.classList.contains("page-flipped")) return;
+    const main = document.querySelector("main");
+    const anchor = [...main.querySelectorAll("#status, #results")].find((el) => !el.hidden);
+    document.body.classList.remove("page-flipped");
+    window.removeEventListener("deviceorientation", onPageOrientation);
+    screen.orientation?.removeEventListener?.("change", unflipPage);
+    anchor?.scrollIntoView({ block: "start" });
+  }
+
+  function onPageOrientation(e) {
+    if (e.beta != null && e.beta > 25) unflipPage(); // Handy wieder normal gehalten
+  }
+
+  document.getElementById("unflipBtn").addEventListener("click", unflipPage);
+  const isPageFlipped = () => document.body.classList.contains("page-flipped");
 
   flipBtn.addEventListener("click", () => { manual = true; flipped = !flipped; update(); });
 
-  return { ready, show, hide, requestSensor };
+  return { ready, show, hide, requestSensor, isPageFlipped, unflipPage };
 })();

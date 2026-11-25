@@ -40,6 +40,7 @@ const History = (() => {
   const get = (id) => run("readonly", (s) => s.get(id));
   const remove = (id) => run("readwrite", (s) => s.delete(id));
   const count = () => run("readonly", (s) => s.count());
+  const clear = () => run("readwrite", (s) => s.clear());
   async function all() {
     const list = await run("readonly", (s) => s.getAll());
     return list.sort((a, b) => b.created - a.created);
@@ -82,5 +83,5 @@ const History = (() => {
     return "﻿" + rows.map((r) => r.map(csvCell).join(";")).join("\n");
   }
 
-  return { add, put, get, remove, all, count, placeName, toCSV };
+  return { add, put, get, remove, clear, all, count, placeName, toCSV };
 })();

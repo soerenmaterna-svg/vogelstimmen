@@ -220,3 +220,25 @@ footer a { color: var(--green); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Ergebnisseite gedreht (nach einer Aufnahme mit gedrehter Anzeige) */
+.unflip { display: none; }
+body.page-flipped main {
+  position: fixed; inset: 0; max-width: none; overflow-y: auto; z-index: 20;
+  transform: rotate(180deg); background: #f4f1e8; padding: 12px 16px 40px;
+}
+body.page-flipped .unflip {
+  display: block; width: 100%; margin-bottom: 12px; padding: 12px; border-radius: 999px;
+  background: var(--green); color: #fff; font-weight: 700;
+  position: sticky; top: 0; z-index: 2; box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+body.page-flipped .bird-row { display: none; }
+
+/* Löschen */
+.tool-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.danger-outline { color: var(--red); border-color: var(--red); }
+.danger-link { color: var(--red); }
+.history-item .del {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; background: #fff3f1;
+  color: var(--red); font-size: 1.05rem; display: grid; place-items: center;
+}

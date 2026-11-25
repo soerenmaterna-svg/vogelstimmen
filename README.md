@@ -20,7 +20,8 @@ danach liegt es im Browser-Cache.
   und zeigt während der Aufnahme mit einem großen Pfeil, wo das Mikrofon ist und welche Seite zum
   Vogel zeigen soll. Hält man das Handy mit dem Mikrofon nach vorne/oben, dreht sich die Anzeige
   automatisch um 180°, damit sie lesbar bleibt (oder per Knopf „Schrift drehen“). Dreht das
-  Gerät die Anzeige selbst (Querformat, kopfüber), wandert der Pfeil mit und zeigt weiter zum Mikrofon.
+  Gerät die Anzeige selbst (Querformat, kopfüber), wandert der Pfeil mit und zeigt weiter zum Mikrofon. War die Anzeige beim Beenden gedreht,
+  erscheint auch das Ergebnis gedreht, bis man das Handy wieder normal hält.
   Hinweis: Browser verraten die genaue Mikrofon-Lage nicht; die App nutzt die typische Lage
   (Handys unten an der Ladebuchse, Tablets und Laptops oben).
 - Hochladen von Aufnahmen (mp3, m4a, wav, ogg, flac, webm …)
@@ -43,6 +44,8 @@ danach liegt es im Browser-Cache.
   Notiz, und man kann die Aufnahme jederzeit wieder anhören.
 - **„Gesehen“-Knopf:** Bei jedem erkannten Vogel lässt sich bestätigen, dass man ihn auch
   gesehen hat. Im Verlauf kann man nach bestätigten Sichtungen filtern.
+- **Löschen:** einzelne Funde per 🗑️ in der Liste oder in der Detailansicht, direkt nach der
+  Bestimmung per „Wieder entfernen“, oder alle auf einmal
 - **Export:** Alle Funde als Tabelle (CSV, öffnet sich in Excel/LibreOffice)
 - Lässt sich über „Zum Startbildschirm hinzufügen“ wie eine App aufs Handy legen
 

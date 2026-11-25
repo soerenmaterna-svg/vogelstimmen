@@ -231,6 +231,7 @@ function renderResults(data, entry) {
   renderResultItems(resultList, data.results.slice(0, 5), entry);
   $("noiseInfo").textContent = noiseText(data.noises);
   $("savedInfo").hidden = !entry;
+  $("removedInfo").hidden = true;
   resultsEl.hidden = false;
   resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -383,6 +384,7 @@ async function renderHistory() {
         <div class="h-meta"></div>
         <div class="h-meta h-place"></div>
       </div>
+      <button class="del" title="Fund löschen" aria-label="Fund löschen">🗑️</button>
       <div class="h-arrow">›</div>`;
     const title = seen.length
       ? seen.map((r) => `✅ ${r.name}`).join(", ")
@@ -391,6 +393,12 @@ async function renderHistory() {
     li.querySelector(".h-meta").textContent = formatDate(e.created) + (e.results.length > 1 && !seen.length ? ` · +${e.results.length - 1} weitere` : "");
     li.querySelector(".h-place").textContent = "📍 " + placeText(e);
     li.addEventListener("click", () => openDetail(e.id));
+    li.querySelector(".del").addEventListener("click", async (ev) => {
+      ev.stopPropagation();
+      if (!confirm(`Diesen Fund vom ${formatDate(e.created)} mit Aufnahme löschen?`)) return;
+      await deleteEntry(e.id);
+      renderHistory();
+    });
     if (top || seen[0]) loadImage((seen[0] || top).scientific, li.querySelector(".ph"));
     list.appendChild(li);
   }
@@ -458,11 +466,37 @@ $("detailNote").addEventListener("input", () => {
 
 $("deleteBtn").addEventListener("click", async () => {
   if (!detailEntry || !confirm("Diesen Fund mit Aufnahme wirklich löschen?")) return;
-  await History.remove(detailEntry.id);
-  if (currentEntryId === detailEntry.id) currentEntryId = null;
+  await deleteEntry(detailEntry.id);
   detailEntry = null;
-  updateHistoryCount();
   openHistory();
+});
+
+// Fund löschen; betrifft er das gerade angezeigte Ergebnis, dort ebenfalls anpassen
+async function deleteEntry(id) {
+  await History.remove(id);
+  if (currentEntryId === id) markCurrentRemoved();
+  updateHistoryCount();
+}
+
+function markCurrentRemoved() {
+  currentEntryId = null;
+  $("savedInfo").hidden = true;
+  $("removedInfo").hidden = false;
+  resultList.querySelectorAll(".seen").forEach((b) => b.remove()); // kein Speichern mehr möglich
+}
+
+$("removeSaved").addEventListener("click", async () => {
+  if (currentEntryId == null || !confirm("Diese Aufnahme wieder aus „Meine Funde“ entfernen?")) return;
+  await deleteEntry(currentEntryId);
+});
+
+$("deleteAllBtn").addEventListener("click", async () => {
+  const n = await History.count();
+  if (!n || !confirm(`Wirklich alle ${n} Funde mit Aufnahmen löschen? Das lässt sich nicht rückgängig machen.`)) return;
+  await History.clear();
+  if (currentEntryId != null) markCurrentRemoved();
+  updateHistoryCount();
+  renderHistory();
 });
 
 // ---------- Hilfsfunktionen ----------
