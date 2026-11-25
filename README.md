@@ -77,6 +77,12 @@ pip install -r tools/requirements.txt
 cd tools && python make_europe_list.py && python build_data.py
 ```
 
+## Bildnachweis
+
+Die Vogelfotos stammen von [iNaturalist](https://www.inaturalist.org/) (über [GBIF](https://www.gbif.org/))
+und stehen unter **CC BY 4.0**. Fotografen und Quellen stehen in `img/voegel/bildnachweis.json`
+und in der App unter „Bildnachweis der Vogelfotos“. Die Fotos wurden quadratisch zugeschnitten.
+
 ## Lizenz der Modelle
 
 Die BirdNET-Modelle stehen unter **CC BY-NC 4.0**. Private und nicht-kommerzielle Nutzung

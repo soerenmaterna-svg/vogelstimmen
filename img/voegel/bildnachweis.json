@@ -1,0 +1,74 @@
+[
+ {
+  "file": "img/voegel/rotkehlchen.jpg",
+  "name": "Rotkehlchen",
+  "scientific": "Erithacus rubecula",
+  "author": "Susan Marley",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333200284"
+ },
+ {
+  "file": "img/voegel/blaumeise.jpg",
+  "name": "Blaumeise",
+  "scientific": "Cyanistes caeruleus",
+  "author": "Daniel Ghyselinck",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333419229"
+ },
+ {
+  "file": "img/voegel/buchfink.jpg",
+  "name": "Buchfink",
+  "scientific": "Fringilla coelebs",
+  "author": "Gabriele Vaudano",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333205019"
+ },
+ {
+  "file": "img/voegel/stieglitz.jpg",
+  "name": "Stieglitz",
+  "scientific": "Carduelis carduelis",
+  "author": "Dave",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333506346"
+ },
+ {
+  "file": "img/voegel/eisvogel.jpg",
+  "name": "Eisvogel",
+  "scientific": "Alcedo atthis",
+  "author": "Luke",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333344180"
+ },
+ {
+  "file": "img/voegel/kohlmeise.jpg",
+  "name": "Kohlmeise",
+  "scientific": "Parus major",
+  "author": "Константин Селивёрстов",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333287127"
+ },
+ {
+  "file": "img/voegel/gimpel.jpg",
+  "name": "Gimpel",
+  "scientific": "Pyrrhula pyrrhula",
+  "author": "Вячеслав Шуплецов",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333434855"
+ },
+ {
+  "file": "img/voegel/kleiber.jpg",
+  "name": "Kleiber",
+  "scientific": "Sitta europaea",
+  "author": "Полина Полежанкина",
+  "license": "CC BY 4.0",
+  "license_url": "http://creativecommons.org/licenses/by/4.0/",
+  "source": "https://www.inaturalist.org/observations/333012664"
+ }
+]
