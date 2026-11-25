@@ -237,7 +237,8 @@ body.page-flipped .unflip {
 body.page-flipped .bird-row { display: none; }
 
 /* Löschen */
-.tool-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.tool-buttons { display: flex; gap: 8px; }
+.tool-buttons button { flex: 1 1 0; min-width: 0; padding: 10px 8px; font-size: .92rem; }
 .danger-outline { color: var(--red); border-color: var(--red); }
 .danger-link { color: var(--red); }
 .history-item .del {
@@ -256,3 +257,9 @@ body.page-flipped .bird-row { display: none; }
 body:not(.mode-insekten) .only-insekten,
 body.mode-insekten .only-voegel { display: none !important; }
 @media (max-width: 999px) { .hero { padding-top: 40px; } }
+
+/* Verlauf: jede Art in einer eigenen Zeile, Haken direkt hinter dem Namen */
+.h-species { display: grid; grid-template-columns: max-content auto; column-gap: 8px; row-gap: 2px; align-items: center; }
+.h-line { display: contents; line-height: 1.3; }
+.h-line > span:first-child { overflow-wrap: anywhere; }
+.h-line .tick { justify-self: start; }

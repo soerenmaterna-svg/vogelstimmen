@@ -53,7 +53,7 @@ danach liegt es im Browser-Cache.
   gesehen hat. Im Verlauf kann man nach bestätigten Sichtungen filtern.
 - **Löschen:** einzelne Funde per 🗑️ in der Liste oder in der Detailansicht, direkt nach der
   Bestimmung per „Wieder entfernen“, oder alle auf einmal
-- **Export:** Alle Funde als Tabelle (CSV, öffnet sich in Excel/LibreOffice)
+- **PDF:** Alle Funde als übersichtliche Tabelle im PDF (ein Fund pro Zeile, bestätigte Sichtungen fett)
 - Lässt sich über „Zum Startbildschirm hinzufügen“ wie eine App aufs Handy legen
 
 ## Tipps für gute Ergebnisse
@@ -71,11 +71,11 @@ danach liegt es im Browser-Cache.
 | `birdnet.js` | Vogelerkennung (BirdNET 2.4): Audio einlesen, Spektrogramm, Modell, Bewertung |
 | `insects.js` | Heuschrecken-/Insektenerkennung (BirdNET+ 3.0, ONNX Runtime Web) |
 | `mic.js` | Geräteerkennung, Mikrofon-Pfeil, Drehen des Aufnahme-Vollbilds (0°/180°) |
-| `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, CSV-Export |
+| `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, PDF-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
 | `model-insekten/` | BirdNET+ V3.0, Ausgabe auf Insekten gekürzt (`tools/build_insects.py`) |
 | `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge (Insekten: `data/insekten/`) |
-| `vendor/` | TensorFlow.js 4.22 mit WebAssembly-Backend, ONNX Runtime Web 1.31 (`vendor/ort`, MIT) |
+| `vendor/` | TensorFlow.js 4.22 mit WebAssembly-Backend, ONNX Runtime Web 1.31 (`vendor/ort`, MIT), jsPDF 4.2 + AutoTable 5.0 (`vendor/pdf`, MIT) |
 | `tools/` | Python-Skripte, mit denen `model/` und `data/` erzeugt wurden |
 
 Lokal testen: im Ordner `python3 -m http.server` starten und <http://localhost:8000> öffnen.

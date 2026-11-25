@@ -61,27 +61,77 @@ const History = (() => {
     }
   }
 
-  function csvCell(v) {
-    const s = v == null ? "" : String(v);
-    return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  // ---------- PDF-Export (jsPDF wird erst beim Exportieren geladen) ----------
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const el = document.createElement("script");
+      el.src = src; el.onload = resolve; el.onerror = () => reject(new Error(`${src} konnte nicht geladen werden`));
+      document.head.appendChild(el);
+    });
   }
 
-  /** Alle Funde als CSV (eine Zeile pro erkannter Art), für Excel mit Semikolon */
-  async function toCSV() {
-    const rows = [["Gruppe", "Datum", "Uhrzeit", "Fundort", "Breite", "Länge", "Art", "Wissenschaftlicher Name",
-      "Sicherheit (%)", "Gesehen", "Notiz"]];
-    for (const e of await all()) {
-      const d = new Date(e.created);
-      const base = [e.mode === "insekten" ? "Heuschrecken/Insekten" : "Vögel", d.toLocaleDateString("de-DE"), d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
-        e.place || "", e.lat?.toFixed(5) ?? "", e.lon?.toFixed(5) ?? ""];
-      const species = e.results.length ? e.results : [{ name: "(nichts erkannt)", scientific: "", confidence: "" }];
-      for (const r of species) {
-        rows.push([...base, r.name, r.scientific, String(r.confidence).replace(".", ","),
-          e.confirmed.includes(r.scientific) ? "ja" : "", e.note || ""]);
-      }
+  let pdfLib = null;
+  function loadPDFLib() {
+    if (!pdfLib) {
+      pdfLib = loadScript("vendor/pdf/jspdf.umd.min.js")
+        .then(() => loadScript("vendor/pdf/jspdf.plugin.autotable.min.js"))
+        .catch((e) => { pdfLib = null; throw e; });
     }
-    return "﻿" + rows.map((r) => r.map(csvCell).join(";")).join("\n");
+    return pdfLib;
   }
 
-  return { add, put, get, remove, clear, all, count, placeName, toCSV };
+  /** Alle Funde als PDF-Tabelle (ein Fund pro Zeile) herunterladen */
+  async function savePDF() {
+    await loadPDFLib();
+    const entries = await all();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const today = new Date();
+    doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+    doc.text("Meine Funde", 14, 16);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100);
+    doc.text(`${entries.length} Funde · erstellt am ${today.toLocaleDateString("de-DE")} um ` +
+      `${today.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr`, 14, 22);
+
+    const body = entries.map((e, i) => {
+      const d = new Date(e.created);
+      // bestätigte Arten zuerst, dann die übrigen; jede Art in einer eigenen Zeile
+      const sorted = [...e.results].sort((a, b) =>
+        (e.confirmed.includes(b.scientific) - e.confirmed.includes(a.scientific)) || b.confidence - a.confidence);
+      const species = sorted.length
+        ? sorted.map((r) => `${r.name}  ${Math.round(r.confidence)} %${e.confirmed.includes(r.scientific) ? "  – gesehen" : ""}`).join("\n")
+        : "(nichts erkannt)";
+      const place = e.place || (e.lat != null ? `${e.lat.toFixed(5)}, ${e.lon.toFixed(5)}` : "–");
+      return [String(entries.length - i), d.toLocaleDateString("de-DE"),
+        d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
+        e.mode === "insekten" ? "Insekten" : "Vögel", species, place, e.note || ""];
+    });
+
+    doc.autoTable({
+      startY: 27,
+      head: [["Nr.", "Datum", "Uhrzeit", "Gruppe", "Erkannt (Sicherheit)", "Fundort", "Notiz"]],
+      body,
+      theme: "grid",
+      styles: { font: "helvetica", fontSize: 9, cellPadding: 2, valign: "top", lineColor: [210, 205, 190] },
+      headStyles: { fillColor: [47, 93, 58], textColor: 255, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [246, 243, 234] },
+      columnStyles: {
+        0: { cellWidth: 11, halign: "right" }, 1: { cellWidth: 22 }, 2: { cellWidth: 16 },
+        3: { cellWidth: 18 }, 4: { cellWidth: 85 }, 5: { cellWidth: 60 }, 6: { cellWidth: "auto" },
+      },
+      didParseCell: (data) => { // bestätigte Sichtungen fett
+        if (data.section === "body" && data.column.index === 4 && String(data.cell.raw).includes("gesehen")) {
+          data.cell.styles.fontStyle = "bold";
+        }
+      },
+      didDrawPage: () => {
+        const n = doc.getNumberOfPages();
+        doc.setFontSize(8); doc.setTextColor(140);
+        doc.text(`Seite ${n}`, doc.internal.pageSize.getWidth() - 14, doc.internal.pageSize.getHeight() - 8, { align: "right" });
+      },
+    });
+    doc.save(`meine-funde-${today.toISOString().slice(0, 10)}.pdf`);
+  }
+
+  return { add, put, get, remove, clear, all, count, placeName, savePDF };
 })();

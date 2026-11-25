@@ -440,10 +440,23 @@ async function renderHistory() {
       </div>
       <button class="del" title="Fund löschen" aria-label="Fund löschen">🗑️</button>
       <div class="h-arrow">›</div>`;
-    const title = seen.length
-      ? seen.map((r) => `✅ ${r.name}`).join(", ")
-      : top ? `${top.name} · ${Math.round(top.confidence)} %` : MODES[e.mode || "voegel"].none;
-    li.querySelector(".h-species").textContent = title;
+    // bestätigte Arten: jede in einer eigenen Zeile, Haken hinter dem Namen
+    const box = li.querySelector(".h-species");
+    const lines = seen.length
+      ? seen.map((r) => [r.name, "✅"])
+      : [[top ? `${top.name} · ${Math.round(top.confidence)} %` : MODES[e.mode || "voegel"].none, ""]];
+    for (const [text, tick] of lines) {
+      const row = document.createElement("div");
+      row.className = "h-line";
+      const name = document.createElement("span");
+      name.textContent = text;
+      row.appendChild(name);
+      const t = document.createElement("span"); // Haken-Spalte (leer, wenn nicht bestätigt)
+      t.className = "tick";
+      t.textContent = tick;
+      row.appendChild(t);
+      box.appendChild(row);
+    }
     li.querySelector(".h-meta").textContent = formatDate(e.created) + (e.results.length > 1 && !seen.length ? ` · +${e.results.length - 1} weitere` : "");
     li.querySelector(".h-place").textContent = "📍 " + placeText(e);
     li.addEventListener("click", () => openDetail(e.id));
@@ -459,15 +472,17 @@ async function renderHistory() {
 }
 
 $("exportBtn").addEventListener("click", async () => {
-  const csv = await History.toCSV();
-  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-  const a = Object.assign(document.createElement("a"), {
-    href: url, download: `vogelfunde-${new Date().toISOString().slice(0, 10)}.csv`,
-  });
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  const btn = $("exportBtn"), label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "PDF wird erstellt …";
+  try {
+    await History.savePDF();
+  } catch (e) {
+    alert("Das PDF konnte nicht erstellt werden: " + (e.message || e));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
 });
 
 // ---------- Detailansicht eines Fundes ----------
