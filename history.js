@@ -81,14 +81,13 @@ const History = (() => {
   }
 
   /** Alle Funde als PDF-Tabelle (ein Fund pro Zeile) herunterladen */
-  async function savePDF() {
+  async function savePDF(entries, groupName = "") {
     await loadPDFLib();
-    const entries = await all();
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
     const today = new Date();
     doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-    doc.text("Meine Funde", 14, 16);
+    doc.text(groupName ? `Meine Funde – ${groupName}` : "Meine Funde", 14, 16);
     doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100);
     doc.text(`${entries.length} Funde · erstellt am ${today.toLocaleDateString("de-DE")} um ` +
       `${today.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })} Uhr`, 14, 22);
@@ -102,9 +101,9 @@ const History = (() => {
         ? sorted.map((r) => `${r.name}  ${Math.round(r.confidence)} %${e.confirmed.includes(r.scientific) ? "  – gesehen" : ""}`).join("\n")
         : "(nichts erkannt)";
       const place = e.place || (e.lat != null ? `${e.lat.toFixed(5)}, ${e.lon.toFixed(5)}` : "–");
-      return [String(entries.length - i), d.toLocaleDateString("de-DE"),
+      return [String(i + 1), d.toLocaleDateString("de-DE"),
         d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }),
-        e.mode === "insekten" ? "Insekten" : "Vögel", species, place, e.note || ""];
+        { insekten: "Insekten", amphibien: "Amphibien" }[e.mode] || "Vögel", species, place, e.note || ""];
     });
 
     doc.autoTable({
@@ -117,7 +116,7 @@ const History = (() => {
       alternateRowStyles: { fillColor: [246, 243, 234] },
       columnStyles: {
         0: { cellWidth: 11, halign: "right" }, 1: { cellWidth: 22 }, 2: { cellWidth: 16 },
-        3: { cellWidth: 18 }, 4: { cellWidth: 85 }, 5: { cellWidth: 60 }, 6: { cellWidth: "auto" },
+        3: { cellWidth: 24 }, 4: { cellWidth: 85 }, 5: { cellWidth: 60 }, 6: { cellWidth: "auto" },
       },
       didParseCell: (data) => { // bestätigte Sichtungen fett
         if (data.section === "body" && data.column.index === 4 && String(data.cell.raw).includes("gesehen")) {

@@ -216,11 +216,17 @@ const MODES = {
     none: "Keine Heuschrecke sicher erkannt", group: "europäischen Heuschrecken, Grillen und Zikaden",
     escape: ["Futterinsekt?", "Wird als Futterinsekt (Zoohandel, Terraristik) gehalten und kann entkommen sein."],
   },
+  amphibien: {
+    engine: () => AmphibNet, icon: "🐸", size: "ca. 60 MB", title: "Amphibien-Erkennung",
+    none: "Keine Amphibie sicher erkannt", group: "europäischen Frosch-, Kröten- und Unkenarten",
+    escape: ["Eingeschleppt/ausgesetzt?", "Kommt in Europa ursprünglich nicht vor, wurde aber eingeschleppt oder aus Terrarien ausgesetzt."],
+  },
 };
-let mode = localStorage.getItem("modus") === "insekten" ? "insekten" : "voegel";
+const GROUP_NAMES = { voegel: "Vögel", insekten: "Heuschrecken, Grillen & Zikaden", amphibien: "Amphibien" };
+let mode = MODES[localStorage.getItem("modus")] ? localStorage.getItem("modus") : "voegel";
 
 // Modelle laden (einmal je Modus, danach im Browser-Cache)
-const modelState = { voegel: { ready: false, promise: null }, insekten: { ready: false, promise: null } };
+const modelState = Object.fromEntries(Object.keys(MODES).map((m) => [m, { ready: false, promise: null }]));
 let statusBusy = false;
 
 function preloadModel(m) {
@@ -247,9 +253,10 @@ async function ensureModel(m) {
 function applyMode(newMode, { userAction = false } = {}) {
   mode = newMode;
   localStorage.setItem("modus", mode);
-  document.body.classList.toggle("mode-insekten", mode === "insekten");
-  $("modeVoegel").classList.toggle("active", mode === "voegel");
-  $("modeInsekten").classList.toggle("active", mode === "insekten");
+  for (const m of Object.keys(MODES)) {
+    document.body.classList.toggle(`mode-${m}`, mode === m);
+    $(`mode${m[0].toUpperCase()}${m.slice(1)}`).classList.toggle("active", mode === m);
+  }
   document.title = MODES[mode].title;
   if (userAction) {
     // Ergebnisse gehören zum anderen Modus -> ausblenden
@@ -260,6 +267,7 @@ function applyMode(newMode, { userAction = false } = {}) {
 }
 $("modeVoegel").addEventListener("click", () => mode !== "voegel" && applyMode("voegel", { userAction: true }));
 $("modeInsekten").addEventListener("click", () => mode !== "insekten" && applyMode("insekten", { userAction: true }));
+$("modeAmphibien").addEventListener("click", () => mode !== "amphibien" && applyMode("amphibien", { userAction: true }));
 applyMode(mode);
 
 function getPosition() {
@@ -393,6 +401,25 @@ updateHistoryCount();
 
 $("onlyConfirmed").addEventListener("change", renderHistory);
 
+// Meine Funde: Gruppe wählen (Alle / Vögel / Insekten / Amphibien)
+let historyGroup = localStorage.getItem("fundeGruppe") || "alle";
+document.querySelectorAll(".gf-btn").forEach((b) => b.addEventListener("click", () => {
+  historyGroup = b.dataset.group;
+  localStorage.setItem("fundeGruppe", historyGroup);
+  renderHistory();
+}));
+
+/** Funde, die in der aktuellen Auswahl angezeigt werden (bei "Alle" nach Gruppe sortiert) */
+function shownEntries(entries) {
+  const order = { voegel: 0, insekten: 1, amphibien: 2 };
+  let list = entries.filter((e) => historyGroup === "alle" || (e.mode || "voegel") === historyGroup);
+  if ($("onlyConfirmed").checked) list = list.filter((e) => e.confirmed.length);
+  if (historyGroup === "alle") {
+    list = [...list].sort((a, b) => (order[a.mode || "voegel"] - order[b.mode || "voegel"]) || b.created - a.created);
+  }
+  return list;
+}
+
 async function openHistory() {
   showView("history");
   await renderHistory();
@@ -419,14 +446,35 @@ async function renderHistory() {
     list.innerHTML = `<li class="hint">Der Verlauf ist in diesem Browser nicht verfügbar (z. B. im privaten Modus).</li>`;
     return;
   }
-  if ($("onlyConfirmed").checked) entries = entries.filter((e) => e.confirmed.length);
+  // Zähler an den Gruppen-Knöpfen
+  const counts = { alle: entries.length };
+  for (const e of entries) counts[e.mode || "voegel"] = (counts[e.mode || "voegel"] || 0) + 1;
+  document.querySelectorAll(".gf-btn").forEach((b) => {
+    const g = b.dataset.group;
+    b.classList.toggle("active", g === historyGroup);
+    if (!b.dataset.label) b.dataset.label = b.textContent;
+    b.innerHTML = "";
+    b.append(b.dataset.label + " ");
+    const n = document.createElement("span"); n.className = "n"; n.textContent = `(${counts[g] || 0})`;
+    b.appendChild(n);
+  });
+
+  entries = shownEntries(entries);
   list.innerHTML = "";
   if (!entries.length) {
-    list.innerHTML = `<li class="hint empty">Noch keine Funde gespeichert. Nimm eine Vogelstimme auf –
-      jede Bestimmung landet automatisch hier.</li>`;
+    list.innerHTML = `<li class="hint empty">Keine Funde in dieser Auswahl. Jede Bestimmung landet automatisch hier.</li>`;
     return;
   }
+  let lastGroup = null;
   for (const e of entries) {
+    const g = e.mode || "voegel";
+    if (historyGroup === "alle" && g !== lastGroup) { // bei "Alle" nach Gruppen getrennt
+      const h = document.createElement("li");
+      h.className = "history-group";
+      h.textContent = `${MODES[g].icon} ${GROUP_NAMES[g]}`;
+      list.appendChild(h);
+      lastGroup = g;
+    }
     const li = document.createElement("li");
     li.className = "history-item";
     const top = e.results[0];
@@ -476,7 +524,9 @@ $("exportBtn").addEventListener("click", async () => {
   btn.disabled = true;
   btn.textContent = "PDF wird erstellt …";
   try {
-    await History.savePDF();
+    const entries = shownEntries(await History.all());
+    if (!entries.length) { alert("Keine Funde in dieser Auswahl."); return; }
+    await History.savePDF(entries, historyGroup === "alle" ? "" : GROUP_NAMES[historyGroup]);
   } catch (e) {
     alert("Das PDF konnte nicht erstellt werden: " + (e.message || e));
   } finally {
@@ -560,10 +610,13 @@ $("removeSaved").addEventListener("click", async () => {
 });
 
 $("deleteAllBtn").addEventListener("click", async () => {
-  const n = await History.count();
-  if (!n || !confirm(`Wirklich alle ${n} Funde mit Aufnahmen löschen? Das lässt sich nicht rückgängig machen.`)) return;
-  await History.clear();
-  if (currentEntryId != null) markCurrentRemoved();
+  const entries = shownEntries(await History.all());
+  const what = historyGroup === "alle" ? "" : ` (${GROUP_NAMES[historyGroup]})`;
+  if (!entries.length || !confirm(`Wirklich alle ${entries.length} angezeigten Funde${what} mit Aufnahmen löschen? Das lässt sich nicht rückgängig machen.`)) return;
+  for (const e of entries) {
+    await History.remove(e.id);
+    if (currentEntryId === e.id) markCurrentRemoved();
+  }
   updateHistoryCount();
   renderHistory();
 });

@@ -15,11 +15,15 @@ danach liegt es im Browser-Cache.
 
 ## Funktionen
 
-- **Umschalter 🐦 / 🦗** oben rechts: Vögel oder **Heuschrecken, Grillen und Zikaden** erkennen.
-  Im Insekten-Modus kennt die App 248 in Europa vorkommende Arten (z. B. Grünes Heupferd,
-  Feldgrille, Weinhähnchen, Nachtigall-Grashüpfer, Roesels Beißschrecke, Gemeine Singzikade,
-  Mannasingzikade) mit BirdNET+ V3.0. Das Insektenmodell (ca. 60 MB mit Rechen-Engine) wird erst
-  geladen, wenn man in den Insekten-Modus wechselt.
+- **Umschalter 🐦 / 🦗 / 🐸** oben rechts: Vögel, **Heuschrecken, Grillen und Zikaden** oder
+  **rufende Amphibien** erkennen.
+  - Insekten: 248 in Europa vorkommende Arten (z. B. Grünes Heupferd, Feldgrille, Weinhähnchen,
+    Nachtigall-Grashüpfer, Roesels Beißschrecke, Gemeine Singzikade, Mannasingzikade)
+  - Amphibien: 32 in Europa vorkommende Arten (Laubfrösche inkl. Mittelmeer-, Italienischer und
+    Iberischer Laubfrosch, Wasserfrösche, Gras-, Moor- und Springfrosch, Erd-, Kreuz- und
+    Wechselkröte, Rot- und Gelbbauchunke, Knoblauchkröte, Geburtshelferkröten, Schlammtaucher)
+  - Beide nutzen ein gemeinsames Modell (BirdNET+ V3.0, ca. 60 MB mit Rechen-Engine), das erst
+    beim Wechsel in einen dieser Modi geladen wird.
 
 - Aufnahme direkt im Browser mit buntem Live-Spektrum (bis 2 Minuten), danach automatische Analyse
 - **Mikrofon-Wegweiser:** Die App erkennt das Gerät (iPhone, Android-Handy, iPad/Tablet, Computer)
@@ -53,6 +57,8 @@ danach liegt es im Browser-Cache.
   gesehen hat. Im Verlauf kann man nach bestätigten Sichtungen filtern.
 - **Löschen:** einzelne Funde per 🗑️ in der Liste oder in der Detailansicht, direkt nach der
   Bestimmung per „Wieder entfernen“, oder alle auf einmal
+- **Meine Funde nach Gruppen:** Schalter Alle / Vögel / Insekten / Amphibien; bei „Alle“ nach
+  Gruppen getrennt. PDF und „Alle löschen“ beziehen sich auf die gewählte Auswahl.
 - **PDF:** Alle Funde als übersichtliche Tabelle im PDF (ein Fund pro Zeile, bestätigte Sichtungen fett)
 - Lässt sich über „Zum Startbildschirm hinzufügen“ wie eine App aufs Handy legen
 
@@ -69,12 +75,12 @@ danach liegt es im Browser-Cache.
 |---|---|
 | `index.html`, `app.js`, `style.css` | Oberfläche (Aufnahme, Upload, Ergebnisse) |
 | `birdnet.js` | Vogelerkennung (BirdNET 2.4): Audio einlesen, Spektrogramm, Modell, Bewertung |
-| `insects.js` | Heuschrecken-/Insektenerkennung (BirdNET+ 3.0, ONNX Runtime Web) |
+| `v3net.js` | Erkennung von Insekten und Amphibien (BirdNET+ 3.0, ONNX Runtime Web) |
 | `mic.js` | Geräteerkennung, Mikrofon-Pfeil, Drehen des Aufnahme-Vollbilds (0°/180°) |
 | `history.js` | Verlauf „Meine Funde“ (IndexedDB), Ortsname, PDF-Export |
 | `model/` | BirdNET v2.4 als TensorFlow.js-Modell (Gewichte als float16) |
-| `model-insekten/` | BirdNET+ V3.0, Ausgabe auf Insekten gekürzt (`tools/build_insects.py`) |
-| `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge (Insekten: `data/insekten/`) |
+| `model-v3/` | BirdNET+ V3.0, Ausgabe auf Insekten, Amphibien und Störgeräusche gekürzt (`tools/build_v3.py`) |
+| `data/` | deutsche Namen, Europa-Artenliste, Standort-Raster, Gefangenschaftsflüchtlinge (Insekten/Amphibien: `data/v3/`, `data/insekten/`, `data/amphibien/`) |
 | `vendor/` | TensorFlow.js 4.22 mit WebAssembly-Backend, ONNX Runtime Web 1.31 (`vendor/ort`, MIT), jsPDF 4.2 + AutoTable 5.0 (`vendor/pdf`, MIT) |
 | `tools/` | Python-Skripte, mit denen `model/` und `data/` erzeugt wurden |
 
@@ -103,7 +109,7 @@ Die Quellen stehen in `img/voegel/quellen.txt`.
 - **Vögel:** BirdNET v2.4 (Cornell Lab of Ornithology & TU Chemnitz), **CC BY-NC 4.0** –
   private und nicht-kommerzielle Nutzung erlaubt.
   Quelle: <https://zenodo.org/records/15050749>
-- **Heuschrecken/Insekten:** BirdNET+ V3.0 und BirdNET+ Geomodel V3.0.5 (The BirdNET Team),
-  **Apache License 2.0**. Das Modell wurde auf Insekten und Störgeräusche gekürzt.
+- **Heuschrecken/Insekten und Amphibien:** BirdNET+ V3.0 und BirdNET+ Geomodel V3.0.5 (The BirdNET Team),
+  **Apache License 2.0**. Das Modell wurde auf Insekten, Amphibien und Störgeräusche gekürzt.
   Quelle: <https://zenodo.org/records/24362980>
-- Europa-Liste der Insekten ergänzt um Fundmeldungen aus [GBIF](https://www.gbif.org/).
+- Europa-Listen der Insekten und Amphibien ergänzt um Fundmeldungen aus [GBIF](https://www.gbif.org/).

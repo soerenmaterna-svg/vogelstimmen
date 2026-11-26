@@ -1,0 +1,32 @@
+Alytes almogavarii_Almogavar-Geburtshelferkröte
+Alytes cisternasii_Iberische Geburtshelferkröte
+Alytes dickhilleni_Südostiberische Geburtshelferkröte
+Alytes obstetricans_Nördliche Geburtshelferkröte
+Bombina bombina_Rotbauchunke
+Bombina variegata_Gelbbauchunke
+Bufo bufo_Erdkröte
+Epidalea calamita_Kreuzkröte
+Bufo spinosus_Mittelmeer-Erdkröte
+Bufotes viridis_Wechselkröte
+Hyla arborea_Europäischer Laubfrosch
+Hyla intermedia_Italienischer Laubfrosch
+Hyla meridionalis_Mittelmeer-Laubfrosch
+Hyla molleri_Iberischer Laubfrosch
+Hyla orientalis_Östlicher Laubfrosch
+Hyla sarda_Tyrrhenischer Laubfrosch
+Hyla savignyi_Kleinasiatischer Laubfrosch
+Lithobates catesbeianus_Amerikanischer Ochsenfrosch
+Pelobates fuscus_Knoblauchkröte
+Pelodytes atlanticus_Portugiesischer Schlammtaucher
+Pelodytes ibericus_Iberischer Schlammtaucher
+Pelodytes punctatus_Westlicher Schlammtaucher
+Pelophylax epeiroticus_Epirus-Wasserfrosch
+Pelophylax esculentus_Teichfrosch
+Pelophylax lessonae_Kleiner Wasserfrosch
+Pelophylax perezi_Iberischer Wasserfrosch
+Pelophylax ridibundus_Seefrosch
+Pelophylax saharicus_Saharawasserfrosch
+Rana arvalis_Moorfrosch
+Rana dalmatina_Springfrosch
+Rana temporaria_Grasfrosch
+Sclerophrys mauritanica_Berberkröte
