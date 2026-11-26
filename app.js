@@ -22,7 +22,7 @@ function showView(name) {
 }
 $("tabIdentify").addEventListener("click", () => showView("identify"));
 $("tabHistory").addEventListener("click", () => openHistory());
-$("backBtn").addEventListener("click", () => openHistory());
+$("backBtn").addEventListener("click", () => openHistory({ keepGroup: true }));
 
 // ---------- Aufnahme ----------
 recBtn.addEventListener("click", () => (recorder ? stopRecording() : startRecording()));
@@ -402,25 +402,22 @@ updateHistoryCount();
 $("onlyConfirmed").addEventListener("change", renderHistory);
 
 // Meine Funde: Gruppe wählen (Alle / Vögel / Insekten / Amphibien)
-let historyGroup = localStorage.getItem("fundeGruppe") || "alle";
+// Beim Öffnen von "Meine Funde" steht die Rubrik auf dem aktuellen Modus; "Alle" kann man danach wählen
+let historyGroup = "voegel";
 document.querySelectorAll(".gf-btn").forEach((b) => b.addEventListener("click", () => {
   historyGroup = b.dataset.group;
-  localStorage.setItem("fundeGruppe", historyGroup);
   renderHistory();
 }));
 
-/** Funde, die in der aktuellen Auswahl angezeigt werden (bei "Alle" nach Gruppe sortiert) */
+/** Funde, die in der aktuellen Auswahl angezeigt werden – immer nach Zeit, neueste zuerst */
 function shownEntries(entries) {
-  const order = { voegel: 0, insekten: 1, amphibien: 2 };
   let list = entries.filter((e) => historyGroup === "alle" || (e.mode || "voegel") === historyGroup);
   if ($("onlyConfirmed").checked) list = list.filter((e) => e.confirmed.length);
-  if (historyGroup === "alle") {
-    list = [...list].sort((a, b) => (order[a.mode || "voegel"] - order[b.mode || "voegel"]) || b.created - a.created);
-  }
-  return list;
+  return [...list].sort((a, b) => b.created - a.created);
 }
 
-async function openHistory() {
+async function openHistory({ keepGroup = false } = {}) {
+  if (!keepGroup) historyGroup = mode; // aktuelle Rubrik vorauswählen
   showView("history");
   await renderHistory();
 }
@@ -465,16 +462,7 @@ async function renderHistory() {
     list.innerHTML = `<li class="hint empty">Keine Funde in dieser Auswahl. Jede Bestimmung landet automatisch hier.</li>`;
     return;
   }
-  let lastGroup = null;
   for (const e of entries) {
-    const g = e.mode || "voegel";
-    if (historyGroup === "alle" && g !== lastGroup) { // bei "Alle" nach Gruppen getrennt
-      const h = document.createElement("li");
-      h.className = "history-group";
-      h.textContent = `${MODES[g].icon} ${GROUP_NAMES[g]}`;
-      list.appendChild(h);
-      lastGroup = g;
-    }
     const li = document.createElement("li");
     li.className = "history-item";
     const top = e.results[0];
@@ -540,7 +528,7 @@ let detailEntry = null, noteTimer = null;
 
 async function openDetail(id) {
   const e = await History.get(id);
-  if (!e) return openHistory();
+  if (!e) return openHistory({ keepGroup: true });
   detailEntry = e;
   showView("detail");
   renderDetailHead(e);
@@ -587,7 +575,7 @@ $("deleteBtn").addEventListener("click", async () => {
   if (!detailEntry || !confirm("Diesen Fund mit Aufnahme wirklich löschen?")) return;
   await deleteEntry(detailEntry.id);
   detailEntry = null;
-  openHistory();
+  openHistory({ keepGroup: true });
 });
 
 // Fund löschen; betrifft er das gerade angezeigte Ergebnis, dort ebenfalls anpassen

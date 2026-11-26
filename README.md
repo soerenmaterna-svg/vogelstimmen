@@ -57,8 +57,9 @@ danach liegt es im Browser-Cache.
   gesehen hat. Im Verlauf kann man nach bestätigten Sichtungen filtern.
 - **Löschen:** einzelne Funde per 🗑️ in der Liste oder in der Detailansicht, direkt nach der
   Bestimmung per „Wieder entfernen“, oder alle auf einmal
-- **Meine Funde nach Gruppen:** Schalter Alle / Vögel / Insekten / Amphibien; bei „Alle“ nach
-  Gruppen getrennt. PDF und „Alle löschen“ beziehen sich auf die gewählte Auswahl.
+- **Meine Funde nach Gruppen:** Schalter Alle / Vögel / Insekten / Amphibien. Beim Öffnen ist die
+  Rubrik des aktuellen Modus gewählt; „Alle“ zeigt alle Funde nach Zeit sortiert. PDF und
+  „Alle löschen“ beziehen sich auf die gewählte Auswahl.
 - **PDF:** Alle Funde als übersichtliche Tabelle im PDF (ein Fund pro Zeile, bestätigte Sichtungen fett)
 - Lässt sich über „Zum Startbildschirm hinzufügen“ wie eine App aufs Handy legen
 
